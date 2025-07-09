@@ -6,6 +6,8 @@ use App\Models\User;
 use App\Models\Reward;
 use App\Models\Booking;
 use App\Models\Festival;
+use App\Models\Bus;
+use App\Models\Trip;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -51,5 +53,16 @@ class DatabaseSeeder extends Seeder
             $rewards->random(2)->pluck('id'),
             ['redeemed_at' => now()]
         );
+
+        // Create 5 buses
+        $buses = Bus::factory(5)->create();
+
+        // Create 20 trips for random users and buses
+        User::inRandomOrder()->take(10)->get()->each(function ($user) use ($buses) {
+            Trip::factory(2)->create([
+                'user_id' => $user->id,
+                'bus_id' => $buses->random()->id,
+            ]);
+        });
     }
 }
