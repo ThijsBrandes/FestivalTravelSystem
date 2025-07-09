@@ -1,12 +1,12 @@
 <?php
 
+use App\Http\Controllers\FestivalController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\BookingController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\EnsureAdmin;
 
-Route::get('/', function () {
-    return view('welcome');
-})->name('welcome');
+Route::get('/', [FestivalController::class, 'home'])->name('welcome');
 
 Route::get('/about', function () {
     return view('about');
@@ -15,6 +15,9 @@ Route::get('/about', function () {
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
+
+Route::get('/festivals', [FestivalController::class, 'index'])->name('festivals.index');
+Route::get('/festivals/{festival}', [FestivalController::class, 'show'])->name('festivals.show');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -25,9 +28,8 @@ Route::middleware('auth')->group(function () {
         return view('rewards.index');
     })->name('rewards.index');
 
-    Route::get('/festivals', function () {
-        return view('festivals.index');
-    })->name('festivals.index');
+    Route::post('/create-booking', [BookingController::class, 'create'])->name('booking.create');
+    Route::get('/bookings/{booking}', [BookingController::class, 'show'])->name('bookings.show');
 });
 
 Route::middleware([EnsureAdmin::class])->group(function () {

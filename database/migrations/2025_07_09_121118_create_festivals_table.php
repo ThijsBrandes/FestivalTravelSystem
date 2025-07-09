@@ -15,13 +15,13 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->text('description')->nullable();
+            $table->string('image')->nullable();
             $table->date('date');
             $table->string('location');
             $table->decimal('price', 8, 2)->default(0.00);
             $table->integer('capacity')->default(0);
             $table->integer('booked_tickets')->default(0);
             $table->boolean('is_active')->default(true);
-            $table->json('images')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

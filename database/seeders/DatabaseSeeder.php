@@ -8,7 +8,9 @@ use App\Models\Booking;
 use App\Models\Festival;
 use App\Models\Bus;
 use App\Models\Trip;
+use App\Models\FestivalImage;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Database\Factories\FestivalImageFactory;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -29,7 +31,7 @@ class DatabaseSeeder extends Seeder
         $users = User::factory(9)->create();
 
         // Festivals
-        $festivals = Festival::factory(5)->create();
+        $festivals = Festival::factory(10)->create();
 
         // Rewards
         $rewards = Reward::factory(10)->create();
@@ -64,5 +66,6 @@ class DatabaseSeeder extends Seeder
                 'bus_id' => $buses->random()->id,
             ]);
         });
+
     }
 }

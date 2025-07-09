@@ -11,6 +11,13 @@ class Booking extends Model
     /** @use HasFactory<\Database\Factories\BookingFactory> */
     use HasFactory, SoftDeletes;
 
+    protected $fillable = [
+        'user_id',
+        'festival_id',
+        'status',
+        'total_price',
+    ];
+
     public function user() {
         return $this->belongsTo(User::class);
     }

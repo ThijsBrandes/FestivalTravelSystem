@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('bus_id')->constrained('buses')->onDelete('cascade');
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('festival_id')->constrained('festivals')->onDelete('cascade');
             $table->string('starting_location')->nullable();
             $table->string('destination')->nullable();
             $table->dateTime('departure_time')->nullable();

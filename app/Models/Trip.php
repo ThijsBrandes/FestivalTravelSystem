@@ -30,4 +30,8 @@ class Trip extends Model
     public function bus() {
         return $this->belongsTo(Bus::class);
     }
+
+    public function festival() {
+        return $this->belongsTo(Festival::class);
+    }
 }
