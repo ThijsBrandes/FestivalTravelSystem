@@ -6,7 +6,11 @@ use App\Http\Middleware\EnsureAdmin;
 
 Route::get('/', function () {
     return view('welcome');
-});
+})->name('welcome');
+
+Route::get('/about', function () {
+    return view('about');
+})->name('about');
 
 Route::get('/dashboard', function () {
     return view('dashboard');
@@ -16,6 +20,14 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    Route::get('/rewards', function () {
+        return view('rewards.index');
+    })->name('rewards.index');
+
+    Route::get('/festivals', function () {
+        return view('festivals.index');
+    })->name('festivals.index');
 });
 
 Route::middleware([EnsureAdmin::class])->group(function () {
