@@ -6,7 +6,8 @@ use App\Models\User;
 use App\Models\Reward;
 use App\Models\Booking;
 use App\Models\Festival;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Bus;
+use App\Models\Trip;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -27,7 +28,7 @@ class DatabaseSeeder extends Seeder
         $users = User::factory(9)->create();
 
         // Festivals
-        $festivals = Festival::factory(5)->create();
+        $festivals = Festival::factory(10)->create();
 
         // Rewards
         $rewards = Reward::factory(10)->create();
@@ -44,6 +45,14 @@ class DatabaseSeeder extends Seeder
         Booking::factory(5)->create([
             'user_id' => $bram->id,
             'festival_id' => $festivals->random()->id,
+            'trip_id' => Trip::factory()->create([
+                'user_id' => $bram->id,
+                'bus_id' => Bus::factory()->create()->id,
+                'starting_location' => 'Amsterdam',
+                'destination' => 'Rotterdam',
+                'departure_time' => now()->addDays(1),
+                'arrival_time' => now()->addDays(1)->addHours(2),
+            ])->id,
         ]);
 
         // Give Bram 2 rewards
@@ -51,5 +60,17 @@ class DatabaseSeeder extends Seeder
             $rewards->random(2)->pluck('id'),
             ['redeemed_at' => now()]
         );
+
+        // Create 5 buses
+        $buses = Bus::factory(5)->create();
+
+        // Create 20 trips for random users and buses
+        User::inRandomOrder()->take(10)->get()->each(function ($user) use ($buses, $festivals) {
+            Trip::factory(2)->create([
+                'user_id' => $user->id,
+                'bus_id' => $buses->random()->id,
+                'festival_id' => $festivals->random()->id,
+            ]);
+        });
     }
 }

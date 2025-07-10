@@ -16,7 +16,7 @@ class EnsureAdmin
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (Auth::user()->is_admin !== 1) {
+        if (Auth::user()->is_admin === false) {
             abort(Response::HTTP_FORBIDDEN);
         }
 
