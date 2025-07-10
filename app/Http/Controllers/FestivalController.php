@@ -19,6 +19,10 @@ class FestivalController extends Controller
         $availableSeats = 0;
 
         foreach ($buses as $bus) {
+            if (!$bus || $bus->status !== 'available') {
+                continue;
+            }
+
             $availableSeats += $bus->available_seats;
         }
 
@@ -27,7 +31,7 @@ class FestivalController extends Controller
 
     private function trips($festival)
     {
-        return Trip::where('festival_id', $festival->id)->get();
+        return Trip::where('festival_id', $festival->id)->with('bus')->get();
     }
 
     public function index(Request $request)

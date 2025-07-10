@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('color')->nullable();
             $table->integer('total_seats')->nullable();
             $table->integer('available_seats')->nullable();
-            $table->enum('status', ['available', 'active', 'inactive'])->default('available');
+            $table->enum('status', ['available', 'full', 'active', 'inactive'])->default('available');
             $table->timestamps();
         });
     }

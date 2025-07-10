@@ -28,7 +28,7 @@ class BookingController extends Controller
         $trips = Trip::where('festival_id', $festival->id)->get();
 
         $selectedTrip = $trips->first(function ($trip) use ($request) {
-            return $trip->bus && $trip->bus->available_seats >= $request->quantity;
+            return $trip->bus && $trip->bus->available_seats >= $request->quantity && $trip->bus->status === 'available';
         });
 
         if (!$selectedTrip) {
@@ -38,6 +38,11 @@ class BookingController extends Controller
         $bus = $selectedTrip->bus;
         $bus->available_seats -= $request->quantity;
         $bus->save();
+
+        if ($bus->available_seats <= 0) {
+            $bus->status = 'full';
+            $bus->save();
+        }
 
         $booking = Booking::create([
             'festival_id' => $request->festival_id,
