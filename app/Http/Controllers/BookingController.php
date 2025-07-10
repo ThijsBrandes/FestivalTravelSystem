@@ -46,9 +46,9 @@ class BookingController extends Controller
             return redirect()->back()->withErrors(['error' => 'No available bus found for the selected festival.']);
         }
 
-        $bus->available_seats = $bus->available_seats + $request->quantity;
+        $bus->available_seats = $bus->available_seats - $request->quantity;
 
-        Bus::update($bus);
+        $bus->save();
 
         return redirect()->route('bookings.show', ['booking' => $booking->id])
                          ->with('status', 'Booking created successfully!');
@@ -60,6 +60,26 @@ class BookingController extends Controller
 
         return view('bookings.show', [
             'booking' => $booking,
+        ]);
+    }
+
+    public function index(Request $request)
+    {
+        if (!empty($request->search)) {
+            $searchTerm = $request->input('search');
+
+            $bookings = Booking::where('user_id', auth()->id())
+                ->where(function ($query) use ($searchTerm) {
+                    $query->whereHas('festival', function ($q) use ($searchTerm) {
+                        $q->where('name', 'like', '%' . $searchTerm . '%');
+                    })->orWhere('id', 'like', '%' . $searchTerm . '%');
+                })->get();
+        } else {
+            $bookings = Booking::where('user_id', auth()->id())->get();
+        }
+
+        return view('dashboard', [
+            'bookings' => $bookings,
         ]);
     }
 }

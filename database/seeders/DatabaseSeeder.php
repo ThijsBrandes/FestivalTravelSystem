@@ -48,6 +48,14 @@ class DatabaseSeeder extends Seeder
         Booking::factory(5)->create([
             'user_id' => $bram->id,
             'festival_id' => $festivals->random()->id,
+            'trip_id' => Trip::factory()->create([
+                'user_id' => $bram->id,
+                'bus_id' => Bus::factory()->create()->id,
+                'starting_location' => 'Amsterdam',
+                'destination' => 'Rotterdam',
+                'departure_time' => now()->addDays(1),
+                'arrival_time' => now()->addDays(1)->addHours(2),
+            ])->id,
         ]);
 
         // Give Bram 2 rewards
@@ -60,10 +68,11 @@ class DatabaseSeeder extends Seeder
         $buses = Bus::factory(5)->create();
 
         // Create 20 trips for random users and buses
-        User::inRandomOrder()->take(10)->get()->each(function ($user) use ($buses) {
+        User::inRandomOrder()->take(10)->get()->each(function ($user) use ($buses, $festivals) {
             Trip::factory(2)->create([
                 'user_id' => $user->id,
                 'bus_id' => $buses->random()->id,
+                'festival_id' => $festivals->random()->id,
             ]);
         });
 

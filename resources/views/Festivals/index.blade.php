@@ -5,7 +5,6 @@
         </h2>
     </x-slot>
 
-
     <div class="py-6">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <form method="GET" action="{{ route('festivals.index') }}" class="flex items-center space-x-4">
@@ -22,7 +21,7 @@
         </div>
     </div>
 
-@if (!empty(request()->search))
+    @if (!empty(request()->search))
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 mb-4">
             <p class="text-gray-600">Search results for: <strong>{{ request('search') }}</strong></p>
         </div>
@@ -51,6 +50,15 @@
                             <p class="text-sm text-gray-600">Price: €{{ number_format($festival->price, 2) }}</p>
                             <p class="text-sm text-gray-600">Location: {{ $festival->location }}</p>
                             <p class="text-sm text-gray-600">Date: {{ \Carbon\Carbon::parse($festival->date)->format('d/m/y H:i') }}</p>
+
+                            @auth
+                                @if ($festival->availableSeats > 0)
+                                    <p class="text-sm text-green-600">Available Seats: {{ $festival->availableSeats }}</p>
+                                @else
+                                    <p class="text-sm text-red-600">No seats available</p>
+                                @endif
+                            @endauth
+
                             <button type="button" class="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
                                 <a href="{{ route('festivals.show', $festival->id) }}" class="text-white">
                                     View Details

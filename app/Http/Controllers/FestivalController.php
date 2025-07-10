@@ -8,6 +8,28 @@ use Illuminate\Http\Request;
 
 class FestivalController extends Controller
 {
+    private function availableSeats($festival)
+    {
+        $trips = Trip::where('festival_id', $festival->id)->get();
+
+        $buses = $trips->map(function ($trip) {
+            return $trip->bus;
+        })->unique('id');
+
+        $availableSeats = 0;
+
+        foreach ($buses as $bus) {
+            $availableSeats += $bus->available_seats;
+        }
+
+        return $availableSeats;
+    }
+
+    private function trips($festival)
+    {
+        return Trip::where('festival_id', $festival->id)->get();
+    }
+
     public function index(Request $request)
     {
         if (!empty($request->search)) {
@@ -18,6 +40,11 @@ class FestivalController extends Controller
             // If no search term is provided, retrieve all festivals
             $festivals = Festival::all();
         }
+
+        $festivals = $festivals->map(function ($festival) {
+            $festival->availableSeats = $this->availableSeats($festival);
+            return $festival;
+        });
 
         return view('festivals.index', [
             'festivals' => $festivals,
@@ -35,21 +62,14 @@ class FestivalController extends Controller
 
     public function show(Festival $festival)
     {
-        $trips = Trip::where('festival_id', $festival->id)->get();
+        $availableSeats = $this->availableSeats($festival);
 
-        $buses = $trips->map(function ($trip) {
-            return $trip->bus;
-        });
-
-        $availableSeats = 0;
-
-        foreach ($buses as $bus) {
-            $availableSeats += $bus->available_seats;
-        }
+        $trips = $this->trips($festival);
 
         return view('festivals.show', [
             'festival' => $festival,
             'availableSeats' => $availableSeats,
+            'trips' => $trips,
         ]);
     }
 }

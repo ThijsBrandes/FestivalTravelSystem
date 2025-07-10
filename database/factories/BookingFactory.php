@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\Festival;
 use App\Models\User;
+use App\Models\Trip;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -21,6 +22,7 @@ class BookingFactory extends Factory
         return [
             'user_id' => User::factory(),
             'festival_id' => Festival::factory(),
+            'trip_id' => Trip::factory(),
             'booked_at' => $this->faker->dateTimeBetween('-1 month', 'now'),
             'status' => $this->faker->randomElement(['pending', 'confirmed', 'canceled']),
             'total_price' => $this->faker->numberBetween(10, 500),

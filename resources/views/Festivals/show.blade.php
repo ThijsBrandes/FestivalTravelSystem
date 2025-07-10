@@ -39,6 +39,14 @@
                     @endguest
 
                     @auth
+                        @isset ($trips)
+                            @php
+                                $totalSeats = $trips->map(fn($trip) => $trip->bus)->unique('id')->sum('total_seats');
+                            @endphp
+                        @endisset
+
+                        <p class="mt-2 text-sm text-gray-600">Total seats: {{ $totalSeats }}</p>
+
                         @if ($availableSeats > 0)
                             <p class="mt-2 text-sm text-green-600">Bus available with {{ $availableSeats }} seats left.</p>
                             <form method="POST" action="{{ route('booking.create', ['festival_id' => $festival->id, 'user_id' => auth()->user()->id]) }}" class="mt-4">
@@ -49,6 +57,7 @@
                                     name="quantity"
                                     id="quantity"
                                     min="1"
+                                    max="{{ $availableSeats }}"
                                     value="1"
                                     class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
                                 >

@@ -12,9 +12,7 @@ Route::get('/about', function () {
     return view('about');
 })->name('about');
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', [BookingController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::get('/festivals', [FestivalController::class, 'index'])->name('festivals.index');
 Route::get('/festivals/{festival}', [FestivalController::class, 'show'])->name('festivals.show');

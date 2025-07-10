@@ -34,4 +34,8 @@ class Trip extends Model
     public function festival() {
         return $this->belongsTo(Festival::class);
     }
+
+    public function bookings() {
+        return $this->hasMany(Booking::class);
+    }
 }
