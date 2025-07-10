@@ -49,9 +49,11 @@
 
                         @if ($availableSeats > 0)
                             <p class="mt-2 text-sm text-green-600">Bus available with {{ $availableSeats }} seats left.</p>
+
                             <form method="POST" action="{{ route('booking.create', ['festival_id' => $festival->id, 'user_id' => auth()->user()->id]) }}" class="mt-4">
                                 @csrf
                                 <label for="quantity" class="block text-sm font-medium text-gray-700">Quantity:</label>
+
                                 <input
                                     type="number"
                                     name="quantity"
@@ -61,7 +63,9 @@
                                     value="1"
                                     class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
                                 >
+
                                 <p id="total-price">Total price: <strong>€{{ $festival->price }}</strong></p>
+
                                 <button type="submit" class="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
                                     Book Now
                                 </button>

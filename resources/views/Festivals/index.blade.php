@@ -39,14 +39,16 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
-                @foreach ($festivals as $festival)
+                    @foreach ($festivals as $festival)
                         <div class="mb-4">
                             <h3 class="text-lg font-semibold">{{ $festival->name }}</h3>
+
                             <img
                                 src="{{ asset($festival->image ?? 'No image available') }}"
                                 alt="{{ $festival->name }}"
                                 class="w-30 h-48 object-cover mt-2"
                             >
+
                             <p class="text-sm text-gray-600">Price: €{{ number_format($festival->price, 2) }}</p>
                             <p class="text-sm text-gray-600">Location: {{ $festival->location }}</p>
                             <p class="text-sm text-gray-600">Date: {{ \Carbon\Carbon::parse($festival->date)->format('d/m/y H:i') }}</p>

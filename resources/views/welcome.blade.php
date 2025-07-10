@@ -19,14 +19,17 @@
                         @foreach ($festivals as $festival)
                             <div class="w-1/2 px-4 mb-4">
                                 <h3 class="text-lg font-semibold">{{ $festival->name }}</h3>
+
                                 <img
                                     src="{{ asset($festival->image ?? 'No image available') }}"
                                     alt="{{ $festival->name }}"
                                     class="w-full h-48 object-cover mt-2"
                                 >
+
                                 <p class="text-sm text-gray-600">Price: €{{ number_format($festival->price, 2) }}</p>
                                 <p class="text-sm text-gray-600">Location: {{ $festival->location }}</p>
                                 <p class="text-sm text-gray-600">Date: {{ \Carbon\Carbon::parse($festival->date)->format('d/m/y H:i') }}</p>
+
                                 <button type="button" class="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
                                     <a href="{{ route('festivals.show', $festival->id) }}" class="text-white">
                                         View Details

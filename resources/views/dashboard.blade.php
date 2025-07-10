@@ -42,6 +42,7 @@
                 @foreach ($bookings as $booking)
                     <div class="border border-gray-200"></div>
                         <p class="pt-6"><strong>Festival:</strong> {{ $booking->festival->name }}</p>
+
                         <div>
                             <img
                                 src="{{ asset($booking->festival->image ?? 'No image available') }}"

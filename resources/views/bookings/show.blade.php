@@ -40,7 +40,6 @@
                     <p class="mt-2 text-sm text-gray-600">Email: {{ $booking->user->email }}</p>
                     <br>
                     <p class="text-sm text-gray-600">Your booking ID is: <strong>{{ $booking->id }}</strong></p>
-
                 </div>
 
                 <div class="p-6">
