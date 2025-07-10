@@ -14,7 +14,6 @@ class BookingController extends Controller
     {
         $request->validate([
             'festival_id' => 'required|exists:festivals,id',
-            'user_id' => 'required|exists:users,id',
             'quantity' => 'required|integer|min:1',
         ]);
 

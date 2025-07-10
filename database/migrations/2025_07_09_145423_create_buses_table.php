@@ -16,8 +16,8 @@ return new class extends Migration
             $table->string('name')->unique();
             $table->string('license_plate')->nullable();
             $table->string('color')->nullable();
-            $table->string('total_seats')->nullable();
-            $table->string('available_seats')->nullable();
+            $table->integer('total_seats')->nullable();
+            $table->integer('available_seats')->nullable();
             $table->enum('status', ['available', 'active', 'inactive'])->default('available');
             $table->timestamps();
         });

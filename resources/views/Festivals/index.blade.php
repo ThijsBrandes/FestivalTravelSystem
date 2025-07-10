@@ -46,7 +46,7 @@
                             <img
                                 src="{{ asset($festival->image ?? 'No image available') }}"
                                 alt="{{ $festival->name }}"
-                                class="w-30 h-48 object-cover mt-2"
+                                class="w-32 h-48 object-cover mt-2"
                             >
 
                             <p class="text-sm text-gray-600">Price: €{{ number_format($festival->price, 2) }}</p>

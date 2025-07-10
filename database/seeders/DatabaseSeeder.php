@@ -8,9 +8,6 @@ use App\Models\Booking;
 use App\Models\Festival;
 use App\Models\Bus;
 use App\Models\Trip;
-use App\Models\FestivalImage;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Database\Factories\FestivalImageFactory;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -75,6 +72,5 @@ class DatabaseSeeder extends Seeder
                 'festival_id' => $festivals->random()->id,
             ]);
         });
-
     }
 }
