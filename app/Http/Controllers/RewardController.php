@@ -8,13 +8,14 @@ use Illuminate\Http\Request;
 class RewardController extends Controller
 {
     public function index(Request $request) {
-        if (!empty($request->search)) {
+        $user = auth()->user();
 
+        if (!empty($request->search)) {
             $request = $request->validate([
                 'search' => 'nullable|string|max:255',
             ]);
 
-            $rewards = Reward::Where(function ($query) use ($request) {
+            $rewards = Reward::where(function ($query) use ($request) {
                 if (!empty($request['search'])) {
                     $query->where('name', 'like', '%' . $request['search'] . '%');
                 }
@@ -22,6 +23,12 @@ class RewardController extends Controller
         } else {
             $rewards = Reward::all();
         }
+
+        $redeemedRewards = $user->rewards()->pluck('reward_id')->toArray();
+
+        $rewards = $rewards->sortBy(function ($reward) use ($redeemedRewards) {
+            return in_array($reward->id, $redeemedRewards) ? 0 : 1;
+        });
 
         return view('rewards.index', [
             'rewards' => $rewards,
