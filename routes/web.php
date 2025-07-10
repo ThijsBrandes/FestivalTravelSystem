@@ -3,6 +3,7 @@
 use App\Http\Controllers\FestivalController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\RewardController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\EnsureAdmin;
 
@@ -22,9 +23,8 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    Route::get('/rewards', function () {
-        return view('rewards.index');
-    })->name('rewards.index');
+    Route::get('/rewards', [RewardController::class, 'index'])->name('rewards.index');
+    Route::post('/rewards/redeem/{reward}', [RewardController::class, 'redeem'])->name('rewards.redeem');
 
     Route::post('/create-booking', [BookingController::class, 'create'])->name('booking.create');
     Route::get('/bookings/{booking}', [BookingController::class, 'show'])->name('bookings.show');
