@@ -21,12 +21,27 @@ class BookingController extends Controller
         $festival = Festival::findOrFail($request->festival_id);
         $totalPrice = $festival->price * $request->quantity;
 
+        $trips = Trip::where('festival_id', $festival->id)->get();
+
+        $selectedTrip = $trips->first(function ($trip) use ($request) {
+            return $trip->bus && $trip->bus->available_seats >= $request->quantity;
+        });
+
+        if (!$selectedTrip) {
+            return redirect()->back()->withErrors(['error' => 'No available trip found for the selected festival.']);
+        }
+
+        $bus = $selectedTrip->bus;
+        $bus->available_seats -= $request->quantity;
+        $bus->save();
+
         $booking = Booking::create([
             'festival_id' => $request->festival_id,
             'user_id' => $request->user_id,
             'ticket_quantity' => $request->quantity,
             'total_price' => $totalPrice,
             'status' => 'pending',
+            'trip_id' => $selectedTrip->id,
         ]);
 
         if ($booking) {
@@ -35,20 +50,6 @@ class BookingController extends Controller
         } else {
             return redirect()->back()->withErrors(['error' => 'Booking could not be created.']);
         }
-
-        $trips = Trip::where('festival_id', $festival->id)->get();
-
-        $bus = $trips->map(function ($trip) {
-            return $trip->bus;
-        })->where('available_seats', '>', $request->quantity)->first();
-
-        if (!$bus) {
-            return redirect()->back()->withErrors(['error' => 'No available bus found for the selected festival.']);
-        }
-
-        $bus->available_seats = $bus->available_seats - $request->quantity;
-
-        $bus->save();
 
         return redirect()->route('bookings.show', ['booking' => $booking->id])
                          ->with('status', 'Booking created successfully!');

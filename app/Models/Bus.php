@@ -14,11 +14,13 @@ class Bus extends Model
         'company',
         'license_plate',
         'color',
-        'seats',
+        'total_seats',
+        'available_seats',
         'status',
     ];
     protected $casts = [
-        'seats' => 'integer',
+        'total_seats' => 'integer',
+        'available_seats' => 'integer',
         'status' => 'string',
     ];
 
