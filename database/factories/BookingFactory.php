@@ -26,6 +26,7 @@ class BookingFactory extends Factory
             'booked_at' => $this->faker->dateTimeBetween('-1 month', 'now'),
             'status' => $this->faker->randomElement(['pending', 'confirmed', 'canceled']),
             'total_price' => $this->faker->numberBetween(10, 500),
+            'total_points' => round($this->faker->numberBetween(10, 500)),
             'ticket_quantity' => $this->faker->numberBetween(1, 10),
         ];
     }

@@ -38,6 +38,7 @@
                     <p class="text-sm text-gray-600">Date: {{ \Carbon\Carbon::parse($booking->festival->date)->format('d/m/y H:i') }}</p>
                     <p class="mt-2 text-sm text-gray-600">Booked by: {{ $booking->user->name }}</p>
                     <p class="mt-2 text-sm text-gray-600">Email: {{ $booking->user->email }}</p>
+                    <p class="mt-2 text-sm text-gray-600">Reward points received: {{ $booking->total_points }}</p>
                     <br>
                     <p class="text-sm text-gray-600">Your booking ID is: <strong>{{ $booking->id }}</strong></p>
                 </div>

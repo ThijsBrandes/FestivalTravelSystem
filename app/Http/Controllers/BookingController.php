@@ -19,6 +19,11 @@ class BookingController extends Controller
 
         $festival = Festival::findOrFail($request->festival_id);
         $totalPrice = $festival->price * $request->quantity;
+        $totalPoints = round($totalPrice, 0);
+
+        $user = auth()->user();
+        $user->points += $totalPoints;
+        $user->save();
 
         $trips = Trip::where('festival_id', $festival->id)->get();
 
@@ -39,6 +44,7 @@ class BookingController extends Controller
             'user_id' => $request->user_id,
             'ticket_quantity' => $request->quantity,
             'total_price' => $totalPrice,
+            'total_points' => $totalPoints,
             'status' => 'pending',
             'trip_id' => $selectedTrip->id,
         ]);

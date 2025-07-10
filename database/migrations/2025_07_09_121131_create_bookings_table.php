@@ -22,6 +22,7 @@ return new class extends Migration
             $table->timestamp('booked_at')->useCurrent();
             $table->enum('status', ['pending', 'confirmed', 'canceled'])->default('pending');
             $table->integer('total_price')->default(0);
+            $table->integer('total_points')->default(0);
             $table->integer('ticket_quantity')->default(1);
             $table->softDeletes();
             $table->timestamps();
