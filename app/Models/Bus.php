@@ -24,7 +24,7 @@ class Bus extends Model
         'status' => 'string',
     ];
 
-    public function trips() {
+    public function trip() {
         return $this->hasMany(Trip::class);
     }
 }

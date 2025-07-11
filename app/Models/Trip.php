@@ -38,4 +38,16 @@ class Trip extends Model
     public function bookings() {
         return $this->hasMany(Booking::class);
     }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::saving(function ($trip) {
+            if ($trip->festival) {
+                $trip->destination = $trip->festival->location;
+            }
+        });
+    }
 }
+

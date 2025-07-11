@@ -26,6 +26,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/rewards', [RewardController::class, 'index'])->name('rewards.index');
     Route::post('/rewards/redeem/{reward}', [RewardController::class, 'redeem'])->name('rewards.redeem');
 
+    Route::post('/preview-booking', [BookingController::class, 'preview'])->name('booking.preview');
     Route::post('/create-booking', [BookingController::class, 'create'])->name('booking.create');
     Route::get('/bookings/{booking}', [BookingController::class, 'show'])->name('bookings.show');
 });

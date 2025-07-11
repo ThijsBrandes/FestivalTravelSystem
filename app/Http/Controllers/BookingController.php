@@ -10,11 +10,50 @@ use App\Models\Trip;
 
 class BookingController extends Controller
 {
+    public function preview(Request $request) {
+        $request->validate([
+            'festival_id' => 'required|exists:festivals,id',
+            'quantity' => 'required|integer|min:1',
+            'starting_location' => 'required|string|max:255',
+        ]);
+
+        $festival = Festival::findOrFail($request->festival_id);
+
+        if (!$festival->is_active) {
+            return redirect()->back()->withErrors(['error' => 'Festival is not active.']);
+        }
+
+        $startingLocation = $request->starting_location;
+
+        $totalPrice = $festival->price * $request->quantity;
+        $totalPoints = round($totalPrice, 0);
+
+        $trip = Trip::where('festival_id', $festival->id)
+            ->where('starting_location', $request->starting_location)
+            ->whereHas('bus', function ($query) use ($request) {
+                $query->where('available_seats', '>=', $request->quantity)
+                    ->where('status', 'available');
+            })->first();
+
+        if (!$trip) {
+            return redirect()->back()->withErrors(['error' => 'No available trip found for the selected festival.']);
+        }
+
+        return view('bookings.preview', [
+            'festival' => $festival,
+            'trip' => $trip,
+            'quantity' => $request->quantity,
+            'totalPrice' => $totalPrice,
+            'totalPoints' => $totalPoints,
+        ]);
+    }
+
     public function create(Request $request)
     {
         $request->validate([
             'festival_id' => 'required|exists:festivals,id',
             'quantity' => 'required|integer|min:1',
+            'trip_id' => 'required|exists:trips,id',
         ]);
 
         $festival = Festival::findOrFail($request->festival_id);
@@ -37,16 +76,16 @@ class BookingController extends Controller
 
         $bus = $selectedTrip->bus;
         $bus->available_seats -= $request->quantity;
-        $bus->save();
 
         if ($bus->available_seats <= 0) {
             $bus->status = 'full';
-            $bus->save();
         }
+
+        $bus->save();
 
         $booking = Booking::create([
             'festival_id' => $request->festival_id,
-            'user_id' => $request->user_id,
+            'user_id' => auth()->id(),
             'ticket_quantity' => $request->quantity,
             'total_price' => $totalPrice,
             'total_points' => $totalPoints,
@@ -84,9 +123,10 @@ class BookingController extends Controller
                     $query->whereHas('festival', function ($q) use ($searchTerm) {
                         $q->where('name', 'like', '%' . $searchTerm . '%');
                     })->orWhere('id', 'like', '%' . $searchTerm . '%');
-                })->get();
+                })->orderBy('booked_at', 'desc')->get();
         } else {
-            $bookings = Booking::where('user_id', auth()->id())->get();
+            $bookings = Booking::where('user_id', auth()->id())
+                ->orderBy('booked_at', 'desc')->get();
         }
 
         return view('dashboard', [

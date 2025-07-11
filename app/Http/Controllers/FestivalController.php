@@ -10,7 +10,9 @@ class FestivalController extends Controller
 {
     private function availableSeats($festival)
     {
-        $trips = Trip::where('festival_id', $festival->id)->get();
+        $trips = Trip::where('festival_id', $festival->id)
+            ->where('destination', $festival->location)
+            ->get();
 
         $buses = $trips->map(function ($trip) {
             return $trip->bus;
@@ -31,7 +33,10 @@ class FestivalController extends Controller
 
     private function trips($festival)
     {
-        return Trip::where('festival_id', $festival->id)->with('bus')->get();
+        return Trip::where('festival_id', $festival->id)
+            ->where('destination', $festival->location)
+            ->with('bus')
+            ->get();
     }
 
     public function index(Request $request)
@@ -41,7 +46,6 @@ class FestivalController extends Controller
                 ->orWhere('location', 'like', '%' . $request->search . '%')
                 ->get();
         } else {
-            // If no search term is provided, retrieve all festivals
             $festivals = Festival::all();
         }
 
