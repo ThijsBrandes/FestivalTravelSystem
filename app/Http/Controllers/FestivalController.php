@@ -41,18 +41,32 @@ class FestivalController extends Controller
 
     public function index(Request $request)
     {
+        $query = Festival::query();
+
         if (!empty($request->search)) {
-            $festivals = Festival::where('name', 'like', '%' . $request->search . '%')
-                ->orWhere('location', 'like', '%' . $request->search . '%')
-                ->get();
-        } else {
-            $festivals = Festival::all();
+            $query->where(function ($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->search . '%')
+                    ->orWhere('location', 'like', '%' . $request->search . '%');
+            });
         }
 
-        $festivals = $festivals->map(function ($festival) {
-            $festival->availableSeats = $this->availableSeats($festival);
-            return $festival;
-        });
+        if (!$request->has('show_inactive')) {
+            $query->where('is_active', true);
+
+            $festivals = $query->get()->filter(function ($festival) {
+                return $this->availableSeats($festival) > 0;
+            })->map(function ($festival) {
+                $festival->availableSeats = $this->availableSeats($festival);
+                return $festival;
+            });
+        } else {
+            $query->where('is_active', false);
+
+            $festivals = $query->get()->map(function ($festival) {
+                $festival->availableSeats = $this->availableSeats($festival);
+                return $festival;
+            });
+        }
 
         return view('festivals.index', [
             'festivals' => $festivals,
