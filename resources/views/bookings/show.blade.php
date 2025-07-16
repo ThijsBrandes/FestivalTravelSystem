@@ -37,6 +37,11 @@
                     <h2 class="text-lg font-bold">Ticket Details</h2>
                     <p><strong>Price per ticket:</strong> €{{ number_format($booking->festival->price, 2) }}</p>
                     <p><strong>Quantity:</strong> {{ $booking->ticket_quantity }}</p>
+                    @if ($booking->reward)
+                        <p><strong>Reward used:</strong> {{ $booking->reward->name }} ({{ $booking->reward->discount_percentage }}% discount)</p>
+                    @else
+                        <p><strong>No reward used.</strong></p>
+                    @endif
                     <p><strong>Total Price:</strong> €{{ number_format($booking->total_price, 2) }}</p>
                     <p><strong>Booking Date:</strong> {{ \Carbon\Carbon::parse($booking->created_at)->format('d/m/y H:i') }}</p>
                     <br>

@@ -16,10 +16,13 @@ class RewardFactory extends Factory
      */
     public function definition(): array
     {
+        $discount = round($this->faker->randomFloat(0, 5, 50) / 5) * 5;
+
         return [
-            'name' => $this->faker->words(2, true),
+            'name' => $discount . '% Off',
             'description' => $this->faker->sentence(),
             'points_required' => $this->faker->numberBetween(50, 300),
+            'discount_percentage' => $discount,
         ];
     }
 }

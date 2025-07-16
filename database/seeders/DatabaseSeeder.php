@@ -58,7 +58,10 @@ class DatabaseSeeder extends Seeder
         // Give Bram 2 rewards
         $bram->rewards()->attach(
             $rewards->random(2)->pluck('id'),
-            ['redeemed_at' => now()]
+            [
+                'redeemed_at' => now(),
+                'used' => false,
+            ]
         );
 
         // Create 5 buses

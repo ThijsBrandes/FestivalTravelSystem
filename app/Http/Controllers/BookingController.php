@@ -39,12 +39,15 @@ class BookingController extends Controller
             return redirect()->back()->withErrors(['error' => 'No available trip found for the selected festival.']);
         }
 
+        $rewards = auth()->user()->rewards()->where('used', false)->get();
+
         return view('bookings.preview', [
             'festival' => $festival,
             'trip' => $trip,
             'quantity' => $request->quantity,
             'totalPrice' => $totalPrice,
             'totalPoints' => $totalPoints,
+            'rewards' => $rewards,
         ]);
     }
 
@@ -54,11 +57,25 @@ class BookingController extends Controller
             'festival_id' => 'required|exists:festivals,id',
             'quantity' => 'required|integer|min:1',
             'trip_id' => 'required|exists:trips,id',
+            'reward_id' => 'nullable|exists:rewards,id',
         ]);
 
         $festival = Festival::findOrFail($request->festival_id);
         $totalPrice = $festival->price * $request->quantity;
         $totalPoints = round($totalPrice, 0);
+
+        if ($request->reward_id) {
+            $reward = auth()->user()->rewards()->findOrFail($request->reward_id);
+
+            $discountAmountInEuros = $totalPrice / 100 * $reward->discount_percentage;
+
+            $totalPrice -= $discountAmountInEuros;
+
+            auth()->user()->rewards()->updateExistingPivot($reward->id, [
+                'used' => true,
+                'used_at' => now(),
+            ]);
+        }
 
         $user = auth()->user();
         $user->points += $totalPoints;
@@ -107,6 +124,12 @@ class BookingController extends Controller
     public function show($id)
     {
         $booking = Booking::findOrFail($id);
+
+        // map reward to booking, using the following query: auth()->user()->rewards()->where('used', true)->where('used_at', $booking->created_at)->get();
+        $booking->reward = auth()->user()->rewards()
+            ->where('used', true)
+            ->where('used_at', $booking->created_at)
+            ->first();
 
         return view('bookings.show', [
             'booking' => $booking,
