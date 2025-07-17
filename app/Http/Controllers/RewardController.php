@@ -11,13 +11,12 @@ class RewardController extends Controller
         $user = auth()->user();
 
         if (!empty($request->search)) {
-            $request = $request->validate([
+            $validatedData = $request->validate([
                 'search' => 'nullable|string|max:255',
             ]);
-
-            $rewards = Reward::where(function ($query) use ($request) {
-                if (!empty($request['search'])) {
-                    $query->where('name', 'like', '%' . $request['search'] . '%');
+            $rewards = Reward::where(function ($query) use ($validatedData) {
+                if (!empty($validatedData['search'])) {
+                    $query->where('name', 'like', '%' . $validatedData['search'] . '%');
                 }
             })->paginate(10);
         } else {

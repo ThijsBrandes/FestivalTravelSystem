@@ -125,10 +125,9 @@ class BookingController extends Controller
     {
         $booking = Booking::findOrFail($id);
 
-        // map reward to booking, using the following query: auth()->user()->rewards()->where('used', true)->where('used_at', $booking->created_at)->get();
         $booking->reward = auth()->user()->rewards()
             ->where('used', true)
-            ->where('used_at', $booking->created_at)
+            ->whereBetween('used_at', [$booking->created_at->subSeconds(3), $booking->created_at->addSeconds(3)])
             ->first();
 
         return view('bookings.show', [
