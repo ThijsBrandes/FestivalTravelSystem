@@ -17,6 +17,7 @@ class Booking extends Model
         'trip_id',
         'status',
         'total_price',
+        'total_points',
         'ticket_quantity',
     ];
 

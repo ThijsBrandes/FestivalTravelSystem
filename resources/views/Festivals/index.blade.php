@@ -39,6 +39,23 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
+                    <!-- checkbox if user wants to see festivals that are not active or have no available seats (don't use controller)-->
+                    <form method="GET" action="{{ route('festivals.index') }}" class="mb-4">
+                        <label class="inline-flex items-center">
+                            <input
+                                type="checkbox"
+                                name="show_inactive"
+                                value="1"
+                                class="form-checkbox h-5 w-5 text-blue-600"
+                                {{ request()->get('show_inactive') ? 'checked' : '' }}
+                            >
+                            <span class="ml-2 text-gray-700">Show inactive festivals or those with no available seats</span>
+                        </label>
+                        <button type="submit" class="ml-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                            Apply
+                        </button>
+                    </form>
+
                     @foreach ($festivals as $festival)
                         <div class="mb-4">
                             <h3 class="text-lg font-semibold">{{ $festival->name }}</h3>
@@ -54,10 +71,14 @@
                             <p class="text-sm text-gray-600">Date: {{ \Carbon\Carbon::parse($festival->date)->format('d/m/y H:i') }}</p>
 
                             @auth
-                                @if ($festival->availableSeats > 0)
+                                @if(!$festival->is_active)
+                                <p class="text-sm text-red-600">Festival is not active</p>
+                                @elseif ($festival->availableSeats > 0)
                                     <p class="text-sm text-green-600">Available Seats: {{ $festival->availableSeats }}</p>
-                                @else
+                                @elseif ($festival->availableSeats === 0)
                                     <p class="text-sm text-red-600">No seats available</p>
+                                @else
+                                    <p class="text-sm text-red-600">Not available right now</p>
                                 @endif
                             @endauth
 

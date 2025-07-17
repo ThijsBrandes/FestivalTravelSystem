@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->text('description')->nullable();
             $table->integer('points_required')->default(0);
+            $table->decimal('discount_percentage', 5, 2)->default(0.00);
             $table->softDeletes();
             $table->timestamps();
         });

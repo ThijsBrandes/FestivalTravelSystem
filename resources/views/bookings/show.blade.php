@@ -27,19 +27,41 @@
                 </div>
 
                 <div class="p-6 text-gray-900">
-                    <h3 class="text-lg font-semibold">Booking Details</h3>
+                    <h1 class="text-2xl font-black">Booking Details</h1>
+                    <p class="text-sm text-gray-600">Your booking ID is: <strong>{{ $booking->id }}</strong></p>
+                    <h2 class="text-lg font-bold">Festival Details</h2>
                     <p><strong>Festival:</strong> {{ $booking->festival->name }}</p>
-                    <p class="mt-2 text-sm text-gray-600">Price per ticket: €{{ number_format($booking->festival->price, 2) }}</p>
+                    <p><strong>Location:</strong> {{ $booking->festival->location }}</p>
+                    <p><strong>Date:</strong> {{ \Carbon\Carbon::parse($booking->festival->date)->format('d/m/y H:i') }}</p>
+                    <br>
+                    <h2 class="text-lg font-bold">Ticket Details</h2>
+                    <p><strong>Price per ticket:</strong> €{{ number_format($booking->festival->price, 2) }}</p>
                     <p><strong>Quantity:</strong> {{ $booking->ticket_quantity }}</p>
+                    @if ($booking->reward)
+                        <p><strong>Reward used:</strong> {{ $booking->reward->name }} ({{ $booking->reward->discount_percentage }}% discount)</p>
+                    @else
+                        <p><strong>No reward used.</strong></p>
+                    @endif
                     <p><strong>Total Price:</strong> €{{ number_format($booking->total_price, 2) }}</p>
                     <p><strong>Booking Date:</strong> {{ \Carbon\Carbon::parse($booking->created_at)->format('d/m/y H:i') }}</p>
                     <br>
-                    <p class="text-sm text-gray-600">Location: {{ $booking->festival->location }}</p>
-                    <p class="text-sm text-gray-600">Date: {{ \Carbon\Carbon::parse($booking->festival->date)->format('d/m/y H:i') }}</p>
-                    <p class="mt-2 text-sm text-gray-600">Booked by: {{ $booking->user->name }}</p>
-                    <p class="mt-2 text-sm text-gray-600">Email: {{ $booking->user->email }}</p>
+                    <h2 class="text-lg font-bold">User Details</h2>
+                    <p><strong>Booked by:</strong> {{ $booking->user->name }}</p>
+                    <p><strong>Email:</strong> {{ $booking->user->email }}</p>
+                    <p><strong>Reward points received:</strong> {{ $booking->total_points }}</p>
                     <br>
-                    <p class="text-sm text-gray-600">Your booking ID is: <strong>{{ $booking->id }}</strong></p>
+                    <h2 class="text-lg font-bold">Trip Information</h2>
+                    @if ($booking->trip)
+                        <p><strong>Bus:</strong> {{ $booking->trip->bus->name }}</p>
+                        <p><strong>License Plate:</strong> {{ $booking->trip->bus->license_plate }}</p>
+                        <p><strong>Bus status:</strong> {{ $booking->trip->bus->status }}</p>
+                        <p><strong>Departure time:</strong> {{ \Carbon\Carbon::parse($booking->trip->departure_time)->format('d/m/y H:i') }} <strong>At:</strong> {{ $booking->trip->starting_location }}</p>
+                        <p><strong>Arrival time:</strong> {{ \Carbon\Carbon::parse($booking->trip->arrival_time)->format('d/m/y H:i') }} <strong>At:</strong> {{ $booking->trip->destination }}</p>
+                        <p><strong>Total Seats:</strong> {{ $booking->trip->bus->total_seats }}</p>
+                        <p><strong>Available Seats:</strong> {{ $booking->trip->bus->available_seats }}</p>
+                    @else
+                        <p class="text-sm text-red-600">No trip information available for this booking.</p>
+                    @endif
                 </div>
 
                 <div class="p-6">

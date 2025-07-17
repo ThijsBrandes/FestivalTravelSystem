@@ -47,11 +47,25 @@
 
                         <p class="mt-2 text-sm text-gray-600">Total seats: {{ $totalSeats }}</p>
 
-                        @if ($availableSeats > 0)
-                            <p class="mt-2 text-sm text-green-600">Bus available with {{ $availableSeats }} seats left.</p>
+                        @if ($availableSeats > 0 && (bool) $festival->is_active === true)
+                            <p class="mt-2 text-sm text-green-600">{{ $availableSeats }} seats left total.</p>
 
-                            <form method="POST" action="{{ route('booking.create', ['festival_id' => $festival->id, 'user_id' => auth()->user()->id]) }}" class="mt-4">
+                            <form method="POST" action="{{ route('booking.preview', ['festival_id' => $festival->id]) }}" class="mt-4">
                                 @csrf
+                                <label for="starting_location" class="block text-sm font-medium text-gray-700">Select Starting Location:</label>
+
+                                <select
+                                    name="starting_location"
+                                    id="starting_location"
+                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                    required
+                                >
+                                    <option value="" disabled selected>Select a location</option>
+                                    @foreach ($trips as $trip)
+                                        <option value="{{ $trip->starting_location }}">{{ $trip->starting_location }}, available seats: {{ $trip->bus->available_seats }}</option>
+                                    @endforeach
+                                </select>
+
                                 <label for="quantity" class="block text-sm font-medium text-gray-700">Quantity:</label>
 
                                 <input

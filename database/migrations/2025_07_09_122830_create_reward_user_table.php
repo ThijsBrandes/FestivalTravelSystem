@@ -20,6 +20,8 @@ return new class extends Migration
                 ->constrained('rewards')
                 ->onDelete('cascade');
             $table->unique(['user_id', 'reward_id']);
+            $table->boolean('used')->default(false);
+            $table->timestamp('used_at')->nullable();
             $table->timestamp('redeemed_at')->useCurrent();
             $table->timestamps();
         });

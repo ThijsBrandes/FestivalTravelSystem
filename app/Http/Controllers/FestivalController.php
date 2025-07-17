@@ -10,7 +10,9 @@ class FestivalController extends Controller
 {
     private function availableSeats($festival)
     {
-        $trips = Trip::where('festival_id', $festival->id)->get();
+        $trips = Trip::where('festival_id', $festival->id)
+            ->where('destination', $festival->location)
+            ->get();
 
         $buses = $trips->map(function ($trip) {
             return $trip->bus;
@@ -19,6 +21,10 @@ class FestivalController extends Controller
         $availableSeats = 0;
 
         foreach ($buses as $bus) {
+            if (!$bus || $bus->status !== 'available') {
+                continue;
+            }
+
             $availableSeats += $bus->available_seats;
         }
 
@@ -27,24 +33,40 @@ class FestivalController extends Controller
 
     private function trips($festival)
     {
-        return Trip::where('festival_id', $festival->id)->get();
+        return Trip::where('festival_id', $festival->id)
+            ->where('destination', $festival->location)
+            ->with('bus')
+            ->get();
     }
 
     public function index(Request $request)
     {
+        $query = Festival::query();
+
         if (!empty($request->search)) {
-            $festivals = Festival::where('name', 'like', '%' . $request->search . '%')
-                ->orWhere('location', 'like', '%' . $request->search . '%')
-                ->get();
-        } else {
-            // If no search term is provided, retrieve all festivals
-            $festivals = Festival::all();
+            $query->where(function ($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->search . '%')
+                    ->orWhere('location', 'like', '%' . $request->search . '%');
+            });
         }
 
-        $festivals = $festivals->map(function ($festival) {
-            $festival->availableSeats = $this->availableSeats($festival);
-            return $festival;
-        });
+        if (!$request->has('show_inactive')) {
+            $query->where('is_active', true);
+
+            $festivals = $query->get()->filter(function ($festival) {
+                return $this->availableSeats($festival) > 0;
+            })->map(function ($festival) {
+                $festival->availableSeats = $this->availableSeats($festival);
+                return $festival;
+            });
+        } else {
+            $query->where('is_active', false);
+
+            $festivals = $query->get()->map(function ($festival) {
+                $festival->availableSeats = $this->availableSeats($festival);
+                return $festival;
+            });
+        }
 
         return view('festivals.index', [
             'festivals' => $festivals,

@@ -22,8 +22,6 @@ class FestivalFactory extends Factory
             'date' => $this->faker->date(),
             'location' => $this->faker->city(),
             'price' => $this->faker->randomFloat(2, 10, 150),
-            'capacity' => $this->faker->numberBetween(50, 5000),
-            'booked_tickets' => $this->faker->numberBetween(0, 500),
             'is_active' => $this->faker->boolean(),
             'image' => $this->faker->randomElement([
                 'festival-images/image1.png',

@@ -58,7 +58,10 @@ class DatabaseSeeder extends Seeder
         // Give Bram 2 rewards
         $bram->rewards()->attach(
             $rewards->random(2)->pluck('id'),
-            ['redeemed_at' => now()]
+            [
+                'redeemed_at' => now(),
+                'used' => false,
+            ]
         );
 
         // Create 5 buses
@@ -66,11 +69,30 @@ class DatabaseSeeder extends Seeder
 
         // Create 20 trips for random users and buses
         User::inRandomOrder()->take(10)->get()->each(function ($user) use ($buses, $festivals) {
-            Trip::factory(2)->create([
-                'user_id' => $user->id,
-                'bus_id' => $buses->random()->id,
-                'festival_id' => $festivals->random()->id,
-            ]);
+            $festival = $festivals->random();
+            $festivalDate = \Carbon\Carbon::parse($festival->date);
+
+            $departure = $festivalDate->copy()->subDay()->setTime(14, 0);
+            $arrival = $festivalDate->copy()->setTime(10, 0); // Assume arrival in the morning
+
+            // Pick a bus that hasn't been used for this festival yet
+            $bus = $buses->first(function ($bus) use ($festival) {
+                return !Trip::where('bus_id', $bus->id)
+                    ->where('festival_id', $festival->id)
+                    ->exists();
+            });
+
+            if ($bus) {
+                Trip::factory()->create([
+                    'user_id' => $user->id,
+                    'bus_id' => $bus->id,
+                    'festival_id' => $festival->id,
+                    'starting_location' => fake()->city,
+                    'destination' => $festival->location,
+                    'departure_time' => $departure,
+                    'arrival_time' => $arrival,
+                ]);
+            }
         });
     }
 }

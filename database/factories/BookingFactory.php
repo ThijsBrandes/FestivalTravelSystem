@@ -25,7 +25,8 @@ class BookingFactory extends Factory
             'trip_id' => Trip::factory(),
             'booked_at' => $this->faker->dateTimeBetween('-1 month', 'now'),
             'status' => $this->faker->randomElement(['pending', 'confirmed', 'canceled']),
-            'total_price' => $this->faker->numberBetween(10, 500),
+            'total_price' => $this->faker->randomFloat(2, 10, 150),
+            'total_points' => round($this->faker->numberBetween(10, 500)),
             'ticket_quantity' => $this->faker->numberBetween(1, 10),
         ];
     }
