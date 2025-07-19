@@ -88,12 +88,27 @@
     let tripIndex = 0;
     let buses = @json($buses);
 
+    function getSelectedBusIds() {
+        const selects = document.querySelectorAll('select[name^="trips"][name$="[bus_id]"]');
+        return Array.from(selects).map(s => s.value).filter(v => v);
+    }
+
     function addTrip() {
+        const selectedBusIds = getSelectedBusIds();
+        const available = buses.filter(bus => !selectedBusIds.includes(String(bus.id)));
+
+        if (available.length === 0) {
+            alert("No more available buses.");
+            return;
+        }
+
         const container = document.getElementById('trips-container');
         const div = document.createElement('div');
         div.classList.add('mb-4', 'border', 'p-3', 'rounded', 'relative');
 
-        let busOptions = buses.map(bus => `<option value="${bus.id}">${bus.license_plate} (Available seats: ${bus.available_seats})</option>`).join('');
+        let busOptions = available.map(bus =>
+            `<option value="${bus.id}">${bus.license_plate} (Available seats: ${bus.available_seats})</option>`
+        ).join('');
 
         div.innerHTML = `
         <label class="block mb-1">Starting Location</label>
@@ -110,10 +125,39 @@
             ${busOptions}
         </select>
 
-        <button type="button" onclick="this.parentElement.remove()" class="absolute bottom-2 right-4 text-red-600 hover:underline text-sm">Delete trip</button>
+        <button type="button" onclick="removeTrip(this)" class="absolute bottom-2 right-4 text-red-600 hover:underline text-sm">Delete trip</button>
     `;
 
         container.appendChild(div);
         tripIndex++;
+        refreshBusDropdowns();
+    }
+
+    function removeTrip(button) {
+        button.parentElement.remove();
+        refreshBusDropdowns();
+    }
+
+    function refreshBusDropdowns() {
+        const selectedBusIds = getSelectedBusIds();
+        const selects = document.querySelectorAll('select[name^="trips"][name$="[bus_id]"]');
+
+        selects.forEach(select => {
+            const currentValue = select.value;
+            select.innerHTML = "";
+
+            buses.forEach(bus => {
+                const isUsed = selectedBusIds.includes(String(bus.id));
+                const isCurrent = String(bus.id) === currentValue;
+
+                if (!isUsed || isCurrent) {
+                    const option = document.createElement('option');
+                    option.value = bus.id;
+                    option.text = `${bus.license_plate} (Available seats: ${bus.available_seats})`;
+                    if (isCurrent) option.selected = true;
+                    select.appendChild(option);
+                }
+            });
+        });
     }
 </script>

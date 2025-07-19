@@ -39,22 +39,23 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
-                    <!-- checkbox if user wants to see festivals that are not active or have no available seats (don't use controller)-->
-                    <form method="GET" action="{{ route('festivals.index') }}" class="mb-4">
-                        <label class="inline-flex items-center">
-                            <input
-                                type="checkbox"
-                                name="show_inactive"
-                                value="1"
-                                class="form-checkbox h-5 w-5 text-blue-600"
-                                {{ request()->get('show_inactive') ? 'checked' : '' }}
-                            >
-                            <span class="ml-2 text-gray-700">Show inactive festivals or those with no available seats</span>
-                        </label>
-                        <button type="submit" class="ml-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
-                            Apply
-                        </button>
-                    </form>
+                    @if (empty(request()->search))
+                        <form method="GET" action="{{ route('festivals.index') }}" class="mb-4">
+                            <label class="inline-flex items-center">
+                                <input
+                                    type="checkbox"
+                                    name="show_inactive"
+                                    value="1"
+                                    class="form-checkbox h-5 w-5 text-blue-600"
+                                    {{ request()->get('show_inactive') ? 'checked' : '' }}
+                                >
+                                <span class="ml-2 text-gray-700">Show inactive festivals or those with no available seats</span>
+                            </label>
+                            <button type="submit" class="ml-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                                Apply
+                            </button>
+                        </form>
+                    @endif
 
                     @foreach ($festivals as $festival)
                         <div class="mb-4">

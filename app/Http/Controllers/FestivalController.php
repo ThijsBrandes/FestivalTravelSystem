@@ -173,9 +173,13 @@ class FestivalController extends Controller
 
     public function edit(Festival $festival)
     {
-        return view('admin.festivals.edit', [
-            'festival' => $festival,
-        ]);
+        $trips = Trip::where('festival_id', $festival->id)->with('bus')->get();
+
+        $buses = Bus::where('status', 'available')
+            ->orWhereIn('id', $trips->pluck('bus_id'))
+            ->get();
+
+        return view('admin.festivals.edit', compact('festival', 'trips', 'buses'));
     }
 
     public function update(Request $request, Festival $festival)
@@ -190,6 +194,7 @@ class FestivalController extends Controller
             'is_active' => 'boolean',
         ]);
 
+        // Handle image
         if ($request->hasFile('image')) {
             $validatedData['image'] = $request->file('image')->store('festival-images', 'public');
 
@@ -200,12 +205,56 @@ class FestivalController extends Controller
             $validatedData['image'] = 'storage/' . $validatedData['image'];
         }
 
-        if ($validatedData['location']) {
-            Trip::where('festival_id', $festival->id)
-                ->update(['destination' => $validatedData['location']]);
+        // If location changed, update destination on all trips
+        if ($validatedData['location'] !== $festival->location) {
+            Trip::where('festival_id', $festival->id)->update([
+                'destination' => $validatedData['location']
+            ]);
         }
 
         $festival->update($validatedData);
+
+        // Sync trips
+        $tripInputs = $request->input('trips', []);
+
+        foreach ($tripInputs as $tripInput) {
+            if (!empty($tripInput['id'])) {
+                $trip = Trip::find($tripInput['id']);
+
+                if (!$trip || $trip->festival_id !== $festival->id) continue;
+
+                // Delete if requested
+                if (!empty($tripInput['delete'])) {
+                    $trip->delete();
+                    Bus::where('id', $trip->bus_id)->update(['status' => 'available']);
+                    continue;
+                }
+
+                // Update trip
+                $trip->update([
+                    'starting_location' => $tripInput['starting_location'],
+                    'departure_time' => $tripInput['departure_time'],
+                    'arrival_time' => $tripInput['arrival_time'],
+                    'bus_id' => $tripInput['bus_id'],
+                ]);
+            } else {
+                // Create new trip
+                $bus = Bus::findOrFail($tripInput['bus_id']);
+
+                if ($bus->status !== 'available') continue;
+
+                Trip::create([
+                    'festival_id' => $festival->id,
+                    'bus_id' => $bus->id,
+                    'starting_location' => $tripInput['starting_location'],
+                    'departure_time' => $tripInput['departure_time'],
+                    'arrival_time' => $tripInput['arrival_time'],
+                    'destination' => $festival->location,
+                ]);
+
+                $bus->update(['status' => 'reserved']);
+            }
+        }
 
         return redirect()->route('admin.festivals.index')
             ->with('status', 'Festival updated successfully.');
