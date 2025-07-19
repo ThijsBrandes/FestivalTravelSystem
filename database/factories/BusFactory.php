@@ -22,7 +22,7 @@ class BusFactory extends Factory
             'color' => $this->faker->safeColorName(),
             'total_seats' => (string) $this->faker->randomElement([20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80]),
             'available_seats' => (string) $this->faker->numberBetween(0, (int) $this->faker->randomElement([20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80])),
-            'status' => 'available',
+            'status' => 'reserved', // Because the bus will be linked to a trip after this
             'created_at' => now(),
             'updated_at' => now(),
         ];

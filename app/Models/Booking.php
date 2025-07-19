@@ -26,7 +26,7 @@ class Booking extends Model
     }
 
     public function festival() {
-        return $this->belongsTo(Festival::class);
+        return $this->belongsTo(Festival::class)->withTrashed();
     }
 
     public function trip() {

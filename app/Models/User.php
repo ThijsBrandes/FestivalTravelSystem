@@ -56,8 +56,4 @@ class User extends Authenticatable
     public function rewards() {
         return $this->belongsToMany(Reward::class)->withTimestamps()->withPivot('redeemed_at');
     }
-
-    public function trips() {
-        return $this->hasMany(Trip::class);
-    }
 }

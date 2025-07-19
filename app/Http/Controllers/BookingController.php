@@ -155,4 +155,58 @@ class BookingController extends Controller
             'bookings' => $bookings,
         ]);
     }
+
+    public function adminIndex(Request $request)
+    {
+        $query = Booking::query();
+
+        if (!empty($request->search)) {
+            $searchTerm = $request->input('search');
+
+            $query->where(function ($q) use ($searchTerm) {
+                $q->whereHas('festival', function ($q) use ($searchTerm) {
+                    $q->where('name', 'like', '%' . $searchTerm . '%');
+                })->orWhere('id', 'like', '%' . $searchTerm . '%');
+            });
+        }
+
+        $bookings = $query->orderBy('booked_at', 'desc')->paginate(20);
+
+        return view('admin.bookings.index', [
+            'bookings' => $bookings,
+        ]);
+    }
+
+    public function edit($id)
+    {
+        $booking = Booking::findOrFail($id);
+
+        return view('admin.bookings.edit', [
+            'booking' => $booking,
+        ]);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $booking = Booking::findOrFail($id);
+
+        $request->validate([
+            'status' => 'required|in:pending,confirmed,cancelled',
+        ]);
+
+        $booking->status = $request->status;
+        $booking->save();
+
+        return redirect()->route('admin.bookings.index')
+                         ->with('status', 'Booking status updated successfully!');
+    }
+
+    public function destroy($id)
+    {
+        $booking = Booking::findOrFail($id);
+        $booking->delete();
+
+        return redirect()->route('admin.bookings.index')
+                         ->with('status', 'Booking deleted successfully!');
+    }
 }

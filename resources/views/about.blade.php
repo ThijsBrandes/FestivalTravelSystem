@@ -29,6 +29,8 @@
                     <p class="mb-4">
                         We also believe in rewarding loyalty. The more you travel with us, the more benefits you'll unlock.
                         Check out <a href="{{ route('rewards.index') }}" class="text-blue-600 underline">what rewards await you</a>.
+                        </br>
+                        Every euro you spend earns you 1 point, which can be redeemed for discounts on future trips.
                     </p>
 
                     <p class="mb-4">

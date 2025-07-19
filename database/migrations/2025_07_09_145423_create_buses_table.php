@@ -14,11 +14,11 @@ return new class extends Migration
         Schema::create('buses', function (Blueprint $table) {
             $table->id();
             $table->string('name')->unique();
-            $table->string('license_plate')->nullable();
+            $table->string('license_plate')->unique();
             $table->string('color')->nullable();
-            $table->integer('total_seats')->nullable();
-            $table->integer('available_seats')->nullable();
-            $table->enum('status', ['available', 'full', 'active', 'inactive'])->default('available');
+            $table->integer('total_seats')->default(0);
+            $table->integer('available_seats')->default(0);
+            $table->enum('status', ['available', 'reserved', 'full', 'inactive'])->default('available');
             $table->timestamps();
         });
     }

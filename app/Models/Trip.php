@@ -11,7 +11,7 @@ class Trip extends Model
 
     protected $fillable = [
         'bus_id',
-        'user_id',
+        'festival_id',
         'starting_location',
         'destination',
         'departure_time',
@@ -22,10 +22,6 @@ class Trip extends Model
         'departure_time' => 'datetime',
         'arrival_time' => 'datetime',
     ];
-
-    public function user() {
-        return $this->belongsTo(User::class);
-    }
 
     public function bus() {
         return $this->belongsTo(Bus::class);

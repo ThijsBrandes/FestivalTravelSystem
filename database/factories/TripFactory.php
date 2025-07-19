@@ -5,7 +5,6 @@ namespace Database\Factories;
 use App\Models\Festival;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Models\Bus;
-use App\Models\User;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Trip>
@@ -23,7 +22,6 @@ class TripFactory extends Factory
 
         return [
             'bus_id' => Bus::factory(),
-            'user_id' => User::factory(),
             'festival_id' => Festival::factory(),
             'starting_location' => $this->faker->city(),
             'destination' => $this->faker->city(),
