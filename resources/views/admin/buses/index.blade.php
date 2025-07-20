@@ -36,6 +36,16 @@
                         </button>
                     </form>
 
+                    @if ($errors->any())
+                        <div class="mb-4">
+                            <ul class="text-red-600">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
                     @if (!empty(request()->search))
                         <div class="mb-4">
                             <p class="text-gray-600">Search results for: <strong>{{ request('search') }}</strong></p>

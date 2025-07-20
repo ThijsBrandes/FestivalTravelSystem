@@ -51,8 +51,7 @@ Route::middleware([EnsureAdmin::class])->group(function () {
     Route::post('/admin/festivals/{festival}/toggle', [FestivalController::class, 'toggle'])->name('admin.festivals.toggle');
 
     Route::get('/admin/bookings', [BookingController::class, 'adminIndex'])->name('admin.bookings.index');
-    Route::get('/admin/bookings/{booking}/edit', [BookingController::class, 'edit'])->name('admin.bookings.edit');
-    Route::put('/admin/bookings/{booking}', [BookingController::class, 'update'])->name('admin.bookings.update');
+    Route::post('/admin/bookings/{booking}', [BookingController::class, 'reconfirm'])->name('admin.bookings.reconfirm');
     Route::delete('/admin/bookings/{booking}', [BookingController::class, 'destroy'])->name('admin.bookings.destroy');
 
     Route::get('/admin/rewards', [RewardController::class, 'adminIndex'])->name('admin.rewards.index');

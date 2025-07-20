@@ -70,7 +70,7 @@ class ProfileController extends Controller
                   ->orWhere('email', 'like', '%' . $request->search . '%');
         }
 
-        $users = $query->paginate(10);
+        $users = $query->get();
 
         return view('admin.users.index', [
             'users' => $users,
@@ -96,14 +96,17 @@ class ProfileController extends Controller
     {
         $user = \App\Models\User::findOrFail($id);
 
-        $request->validate([
+        $validatedData = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
-            'role' => 'required|in:user,admin',
+            'is_admin' => 'required|boolean',
         ]);
 
-        $user->fill($request->only('name', 'email', 'role'));
-        $user->save();
+        if ($user->id === Auth::id() && $validatedData['is_admin'] != $user->is_admin) {
+            return Redirect::route('admin.users.edit', $user->id)->withErrors(['error' => 'You cannot change your own admin status.']);
+        }
+
+        $user->update($validatedData);
 
         return Redirect::route('admin.users.index')->with('status', 'User updated successfully.');
     }

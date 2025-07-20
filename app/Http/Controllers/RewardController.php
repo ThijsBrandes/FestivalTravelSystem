@@ -18,7 +18,7 @@ class RewardController extends Controller
                 if (!empty($validatedData['search'])) {
                     $query->where('name', 'like', '%' . $validatedData['search'] . '%');
                 }
-            })->paginate(10);
+            })->get();
         } else {
             $rewards = Reward::all();
         }
@@ -57,7 +57,7 @@ class RewardController extends Controller
             $query->where('name', 'like', '%' . $request->search . '%');
         }
 
-        $rewards = $query->paginate(10);
+        $rewards = $query->orderBy('created_at', 'desc')->get();
 
         return view('admin.rewards.index', [
             'rewards' => $rewards,
@@ -69,13 +69,14 @@ class RewardController extends Controller
     }
 
     public function store(Request $request) {
-        $request->validate([
+        $validatedData = $request->validate([
             'name' => 'required|string|max:255',
-            'description' => 'nullable|string|max:1000',
+            'description' => 'required|string|max:1000',
             'points_required' => 'required|integer|min:1',
+            'discount_percentage' => 'required|numeric|min:1',
         ]);
 
-        Reward::create($request->all());
+        Reward::create($validatedData);
 
         return redirect()->route('admin.rewards.index')->with('status', 'Reward created successfully!');
     }
@@ -87,13 +88,14 @@ class RewardController extends Controller
     }
 
     public function update(Request $request, Reward $reward) {
-        $request->validate([
+        $validatedData = $request->validate([
             'name' => 'required|string|max:255',
-            'description' => 'nullable|string|max:1000',
+            'description' => 'required|string|max:1000',
             'points_required' => 'required|integer|min:1',
+            'discount_percentage' => 'required|numeric|min:1',
         ]);
 
-        $reward->update($request->all());
+        $reward->update($validatedData);
 
         return redirect()->route('admin.rewards.index')->with('status', 'Reward updated successfully!');
     }

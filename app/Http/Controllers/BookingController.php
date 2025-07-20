@@ -170,43 +170,32 @@ class BookingController extends Controller
             });
         }
 
-        $bookings = $query->orderBy('booked_at', 'desc')->paginate(20);
+        $bookings = $query->orderBy('booked_at', 'desc')->get();
 
         return view('admin.bookings.index', [
             'bookings' => $bookings,
         ]);
     }
 
-    public function edit($id)
+    public function reconfirm($id)
     {
         $booking = Booking::findOrFail($id);
 
-        return view('admin.bookings.edit', [
-            'booking' => $booking,
-        ]);
-    }
-
-    public function update(Request $request, $id)
-    {
-        $booking = Booking::findOrFail($id);
-
-        $request->validate([
-            'status' => 'required|in:pending,confirmed,cancelled',
-        ]);
-
-        $booking->status = $request->status;
+        $booking->status = 'confirmed';
         $booking->save();
 
         return redirect()->route('admin.bookings.index')
-                         ->with('status', 'Booking status updated successfully!');
+                         ->with('status', 'Booking reconfirmed successfully!');
     }
 
     public function destroy($id)
     {
         $booking = Booking::findOrFail($id);
-        $booking->delete();
+
+        $booking->status = 'canceled';
+        $booking->save();
 
         return redirect()->route('admin.bookings.index')
-                         ->with('status', 'Booking deleted successfully!');
+                         ->with('status', 'Booking canceled successfully!');
     }
 }

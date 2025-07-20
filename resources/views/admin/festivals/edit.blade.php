@@ -104,6 +104,16 @@
                             </button>
                         </div>
                     </form>
+
+                    @if ($errors->any())
+                        <div class="mb-4">
+                            <ul class="text-red-600">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>

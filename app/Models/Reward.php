@@ -11,6 +11,13 @@ class Reward extends Model
     /** @use HasFactory<\Database\Factories\RewardFactory> */
     use HasFactory, SoftDeletes;
 
+    protected $fillable = [
+        'name',
+        'description',
+        'points_required',
+        'discount_percentage',
+    ];
+
     public function users() {
         return $this->belongsToMany(User::class)->withTimestamps()->withPivot('redeemed_at');
     }
