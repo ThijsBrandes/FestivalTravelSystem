@@ -199,7 +199,8 @@ class FestivalController extends Controller
             $validatedData['image'] = $request->file('image')->store('festival-images', 'public');
 
             if ($festival->image) {
-                \Storage::disk('public')->delete($festival->image);
+                $imagePath = str_replace('storage/', '', $festival->image);
+                \Storage::disk('public')->delete($imagePath);
             }
 
             $validatedData['image'] = 'storage/' . $validatedData['image'];

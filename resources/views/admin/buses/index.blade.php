@@ -76,7 +76,7 @@
                                 @endif
 
                                 <div class="mt-4">
-                                    <form action="{{ route('admin.buses.destroy', $bus) }}" method="POST" class="inline-block ml-2" onsubmit="return confirm('Are you sure you want to delete this bus? This will also delete all trips assosiated with this bus. This action can not be undone.');">
+                                    <form action="{{ route('admin.buses.destroy', $bus) }}" method="POST" class="inline-block ml-2" onsubmit="return confirm('Are you sure you want to delete this bus? This will also delete all trips associated with this bus. This action cannot be undone.');">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="text-red-600 hover:underline">Delete</button>
