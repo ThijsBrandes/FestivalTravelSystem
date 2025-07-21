@@ -30,6 +30,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/preview-booking', [BookingController::class, 'preview'])->name('booking.preview');
     Route::post('/create-booking', [BookingController::class, 'create'])->name('booking.create');
     Route::get('/bookings/{booking}', [BookingController::class, 'show'])->name('bookings.show');
+    Route::post('/bookings/{booking}', [BookingController::class, 'update'])->name('booking.update');
 });
 
 Route::middleware([EnsureAdmin::class])->group(function () {
