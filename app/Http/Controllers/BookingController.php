@@ -7,6 +7,7 @@ use App\Models\Festival;
 use App\Models\Booking;
 use App\Models\Bus;
 use App\Models\Trip;
+use Illuminate\Support\Facades\Auth;
 
 class BookingController extends Controller
 {
@@ -154,6 +155,26 @@ class BookingController extends Controller
         return view('dashboard', [
             'bookings' => $bookings,
         ]);
+    }
+
+    public function update(Request $request, Booking $booking)
+    {
+        if (Auth::id() === $booking->user->id) {
+            $acquiredPoints = $booking->total_points;
+            $user = Auth::user();
+
+            $user->points -= $acquiredPoints;
+            $user->save();
+
+            $booking->status = 'canceled';
+            $booking->save();
+
+            return redirect()->route('bookings.show', ['booking' => $booking->id])
+                             ->with('status', 'Booking canceled successfully!');
+        } else {
+            return redirect()->route('bookings.show', ['booking' => $booking->id])
+                             ->withErrors(['error' => 'You are not authorized to cancel this booking.']);
+        }
     }
 
     public function adminIndex(Request $request)
