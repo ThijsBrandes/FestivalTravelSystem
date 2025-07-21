@@ -15,7 +15,7 @@
                             &larr; Back to rewards
                         </a>
                     </div>
-                    <!-- Form to edit a reward -->
+                    <!-- Form to create a reward -->
                     <form method="POST" action="{{ route('admin.rewards.store') }}" enctype="multipart/form-data">
                         @csrf
                         @method('POST')

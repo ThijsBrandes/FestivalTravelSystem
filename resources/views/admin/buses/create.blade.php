@@ -44,7 +44,7 @@
 
                         <div class="mb-4">
                             <label for="status" class="block text-sm font-medium text-gray-700">Status (required)</label>
-                            <select name="status" class="border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500" onchange="this.form.submit()">
+                            <select name="status" class="border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
                                 <option value="available">Available</option>
                                 <option value="inactive">Inactive</option>
                             </select>

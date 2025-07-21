@@ -15,7 +15,7 @@
                             &larr; Back to festivals
                         </a>
                     </div>
-                    <!-- Form to edit a festival -->
+                    <!-- Form to create a festival -->
                     <form method="POST" action="{{ route('admin.festivals.store') }}" enctype="multipart/form-data">
                         @csrf
 
