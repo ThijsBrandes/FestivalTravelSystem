@@ -18,7 +18,7 @@ class RewardController extends Controller
                 if (!empty($validatedData['search'])) {
                     $query->where('name', 'like', '%' . $validatedData['search'] . '%');
                 }
-            })->paginate(10);
+            })->get();
         } else {
             $rewards = Reward::all();
         }
@@ -48,5 +48,61 @@ class RewardController extends Controller
         auth()->user()->rewards()->attach($reward->id, ['redeemed_at' => now()]);
 
         return redirect()->route('rewards.index')->with('status', 'Reward redeemed successfully!');
+    }
+
+    public function adminIndex(Request $request) {
+        $query = Reward::query();
+
+        if (!empty($request->search)) {
+            $query->where('name', 'like', '%' . $request->search . '%');
+        }
+
+        $rewards = $query->orderBy('created_at', 'desc')->get();
+
+        return view('admin.rewards.index', [
+            'rewards' => $rewards,
+        ]);
+    }
+
+    public function create() {
+        return view('admin.rewards.create');
+    }
+
+    public function store(Request $request) {
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'required|string|max:1000',
+            'points_required' => 'required|integer|min:1',
+            'discount_percentage' => 'required|numeric|min:1',
+        ]);
+
+        Reward::create($validatedData);
+
+        return redirect()->route('admin.rewards.index')->with('status', 'Reward created successfully!');
+    }
+
+    public function edit(Reward $reward) {
+        return view('admin.rewards.edit', [
+            'reward' => $reward,
+        ]);
+    }
+
+    public function update(Request $request, Reward $reward) {
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'required|string|max:1000',
+            'points_required' => 'required|integer|min:1',
+            'discount_percentage' => 'required|numeric|min:1',
+        ]);
+
+        $reward->update($validatedData);
+
+        return redirect()->route('admin.rewards.index')->with('status', 'Reward updated successfully!');
+    }
+
+    public function destroy(Reward $reward) {
+        $reward->delete();
+
+        return redirect()->route('admin.rewards.index')->with('status', 'Reward deleted successfully!');
     }
 }

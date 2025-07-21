@@ -112,8 +112,29 @@
     <!-- Responsive Navigation Menu -->
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
+            <!-- Home Link -->
+            <x-responsive-nav-link :href="route('welcome')" :active="request()->routeIs('welcome')">
+                {{ __('Home') }}
+            </x-responsive-nav-link>
+
+            <!-- All Festivals Link -->
+            <x-responsive-nav-link :href="route('festivals.index')" :active="request()->routeIs('festivals.index')">
+                {{ __('All Festivals') }}
+            </x-responsive-nav-link>
+
+            <!-- Dashboard Link -->
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                {{ __('Dashboard') }}
+                {{ __('My travels') }}
+            </x-responsive-nav-link>
+
+            <!-- Rewards Link -->
+            <x-responsive-nav-link :href="route('rewards.index')" :active="request()->routeIs('rewards.index')">
+                {{ __('Rewards') }}
+            </x-responsive-nav-link>
+
+            <!-- About Link -->
+            <x-responsive-nav-link :href="route('about')" :active="request()->routeIs('about')">
+                {{ __('About Us') }}
             </x-responsive-nav-link>
         </div>
 
@@ -129,6 +150,12 @@
                     <x-responsive-nav-link :href="route('profile.edit')">
                         {{ __('Profile') }}
                     </x-responsive-nav-link>
+
+                    @if (auth()->user()->is_admin)
+                        <x-responsive-nav-link :href="route('admin.dashboard')">
+                            {{ __('Admin Dashboard') }}
+                        </x-responsive-nav-link>
+                    @endif
 
                     <!-- Authentication -->
                     <form method="POST" action="{{ route('logout') }}">

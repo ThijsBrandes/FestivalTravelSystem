@@ -64,12 +64,25 @@
                     @endif
                 </div>
 
-                <div class="p-6">
-                    <button type="button" class="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
-                        <a href="{{ route('festivals.show', $booking->festival->id) }}" class="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
-                            View Festival Details
-                        </a>
-                    </button>
+                <div class="flex w-full justify-between">
+                    <div class="p-6">
+                        <button type="button" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                            <a href="{{ route('festivals.show', $booking->festival->id) }}" class="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                                View Festival Details
+                            </a>
+                        </button>
+                    </div>
+
+                    @if ($booking->status !== 'canceled')
+                        <div class="p-6">
+                            <form method="POST" action="{{ route('booking.update', $booking) }}" class="" onsubmit="return confirm('Are you sure you want to cancel your booking? This action can not be undone. Your points will also be taken from your account.');">
+                                @csrf
+                                <button type="submit" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
+                                    Cancel booking
+                                </button>
+                            </form>
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>

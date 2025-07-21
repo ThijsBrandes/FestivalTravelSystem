@@ -16,6 +16,10 @@ class EnsureAdmin
      */
     public function handle(Request $request, Closure $next): Response
     {
+        if (!Auth::check()) {
+            return redirect('/login');
+        }
+
         if (Auth::user()->is_admin === false) {
             abort(Response::HTTP_FORBIDDEN);
         }

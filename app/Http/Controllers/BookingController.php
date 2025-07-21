@@ -7,6 +7,7 @@ use App\Models\Festival;
 use App\Models\Booking;
 use App\Models\Bus;
 use App\Models\Trip;
+use Illuminate\Support\Facades\Auth;
 
 class BookingController extends Controller
 {
@@ -154,5 +155,68 @@ class BookingController extends Controller
         return view('dashboard', [
             'bookings' => $bookings,
         ]);
+    }
+
+    public function update(Request $request, Booking $booking)
+    {
+        if (Auth::id() === $booking->user->id) {
+            $acquiredPoints = $booking->total_points;
+            $user = Auth::user();
+
+            $user->points -= $acquiredPoints;
+            $user->save();
+
+            $booking->status = 'canceled';
+            $booking->save();
+
+            return redirect()->route('bookings.show', ['booking' => $booking->id])
+                             ->with('status', 'Booking canceled successfully!');
+        } else {
+            return redirect()->route('bookings.show', ['booking' => $booking->id])
+                             ->withErrors(['error' => 'You are not authorized to cancel this booking.']);
+        }
+    }
+
+    public function adminIndex(Request $request)
+    {
+        $query = Booking::query();
+
+        if (!empty($request->search)) {
+            $searchTerm = $request->input('search');
+
+            $query->where(function ($q) use ($searchTerm) {
+                $q->whereHas('festival', function ($q) use ($searchTerm) {
+                    $q->where('name', 'like', '%' . $searchTerm . '%');
+                })->orWhere('id', 'like', '%' . $searchTerm . '%');
+            });
+        }
+
+        $bookings = $query->orderBy('booked_at', 'desc')->get();
+
+        return view('admin.bookings.index', [
+            'bookings' => $bookings,
+        ]);
+    }
+
+    public function reconfirm($id)
+    {
+        $booking = Booking::findOrFail($id);
+
+        $booking->status = 'confirmed';
+        $booking->save();
+
+        return redirect()->route('admin.bookings.index')
+                         ->with('status', 'Booking reconfirmed successfully!');
+    }
+
+    public function destroy($id)
+    {
+        $booking = Booking::findOrFail($id);
+
+        $booking->status = 'canceled';
+        $booking->save();
+
+        return redirect()->route('admin.bookings.index')
+                         ->with('status', 'Booking canceled successfully!');
     }
 }

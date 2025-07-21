@@ -8,8 +8,23 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Festival extends Model
 {
-    /** @use HasFactory<\Database\Factories\FestivalFactory> */
     use HasFactory, SoftDeletes;
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var list<string>
+     */
+    protected $fillable = [
+        'name',
+        'description',
+        'image',
+        'date',
+        'location',
+        'price',
+        'is_active',
+    ];
+
 
     public function bookings() {
         return $this->hasMany(Booking::class);
