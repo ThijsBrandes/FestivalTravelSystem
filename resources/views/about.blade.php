@@ -23,10 +23,6 @@
                     </ul>
 
                     <p class="mb-4">
-                        Once a festival reaches enough bookings, a bus is automatically scheduled. This keeps things efficient and reliable.
-                    </p>
-
-                    <p class="mb-4">
                         We also believe in rewarding loyalty. The more you travel with us, the more benefits you'll unlock.
                         Check out <a href="{{ route('rewards.index') }}" class="text-blue-600 underline">what rewards await you</a>.
                         </br>
