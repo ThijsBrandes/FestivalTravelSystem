@@ -69,10 +69,10 @@
                                 <p class="text-sm text-gray-600">Available seats: {{ $bus->available_seats }}</p>
                                 <p class="text-sm text-gray-600">Status: {{ $bus->status }}</p>
 
-                                @if ($bus->status === 'active' || $bus->status === 'available')
+                                @if ($bus->status === 'available')
                                     <span class="inline-block bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-semibold">Active</span>
                                 @else
-                                    <span class="inline-block bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs font-semibold">Inactive</span>
+                                    <span class="inline-block bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs font-semibold">Not available</span>
                                 @endif
 
                                 <div class="mt-4">
