@@ -61,7 +61,12 @@ class BookingController extends Controller
             'reward_id' => 'nullable|exists:rewards,id',
         ]);
 
-        $festival = Festival::findOrFail($request->festival_id);
+        $festival = Festival::where('id', $request->festival_id)->where('is_active', true)->first();
+
+        if (!$festival) {
+            return redirect()->back()->withErrors(['error' => 'Festival is not active or does not exist.']);
+        }
+
         $totalPrice = $festival->price * $request->quantity;
         $totalPoints = round($totalPrice, 0);
 
@@ -89,7 +94,7 @@ class BookingController extends Controller
         });
 
         if (!$selectedTrip) {
-            return redirect()->back()->withErrors(['error' => 'No available trip found for the selected festival.']);
+            return redirect()->back()->withErrors(['error' => 'No available trip found or not enough available seats for the selected trip.']);
         }
 
         $bus = $selectedTrip->bus;
@@ -159,7 +164,10 @@ class BookingController extends Controller
 
     public function update(Request $request, Booking $booking)
     {
-        if (Auth::id() === $booking->user->id) {
+        if ($booking->status !== 'canceled' && Auth::id() === $booking->user->id) {
+            $booking->trip->bus->available_seats += $booking->ticket_quantity;
+            $booking->trip->bus->save();
+
             $acquiredPoints = $booking->total_points;
             $user = Auth::user();
 
@@ -171,9 +179,12 @@ class BookingController extends Controller
 
             return redirect()->route('bookings.show', ['booking' => $booking->id])
                              ->with('status', 'Booking canceled successfully!');
-        } else {
-            return redirect()->route('bookings.show', ['booking' => $booking->id])
-                             ->withErrors(['error' => 'You are not authorized to cancel this booking.']);
+        }
+        elseif ($booking->status === 'canceled') {
+            return redirect()->route('bookings.show', ['booking' => $booking->id]);
+        }
+        else {
+            abort(403, 'You are not authorized to cancel this booking.');
         }
     }
 
