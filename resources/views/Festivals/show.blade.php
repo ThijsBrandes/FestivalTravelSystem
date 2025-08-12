@@ -83,6 +83,16 @@
                                 <button type="submit" class="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
                                     Book Now
                                 </button>
+
+                                @if ($errors->any())
+                                    <div class="mt-2 text-red-600">
+                                        <ul>
+                                            @foreach ($errors->all() as $error)
+                                                <li>{{ $error }}</li>
+                                            @endforeach
+                                        </ul>
+                                    </div>
+                                @endif
                             </form>
 
                         @elseif ($availableSeats === 0)

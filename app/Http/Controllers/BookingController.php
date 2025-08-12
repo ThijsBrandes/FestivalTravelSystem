@@ -35,7 +35,7 @@ class BookingController extends Controller
             })->first();
 
         if (!$trip) {
-            return redirect()->back()->withErrors(['error' => 'No available trip found for the selected festival.']);
+            return redirect()->back()->withErrors(['error' => 'No available trip found for the selected (amount of) tickets.']);
         }
 
         $rewards = auth()->user()->rewards()->where('used', false)->get();
