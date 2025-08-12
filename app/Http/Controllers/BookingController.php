@@ -167,6 +167,7 @@ class BookingController extends Controller
         if ($booking->status !== 'canceled' && Auth::id() === $booking->user->id) {
             $booking->trip->bus->available_seats += $booking->ticket_quantity;
 
+            // Set bus status to 'reserved' if there are available seats after cancelation
             if ($booking->trip->bus->status === 'full' && $booking->trip->bus->available_seats > 0) {
                 $booking->trip->bus->status = 'reserved';
             }
@@ -261,6 +262,7 @@ class BookingController extends Controller
         $bus = $booking->trip->bus;
         $bus->available_seats += $booking->ticket_quantity;
 
+        // Set bus status to 'reserved' if there are available seats after cancelation
         if ($bus->status !== 'reserved' && $bus->available_seats > 0) {
             $bus->status = 'reserved';
         }
