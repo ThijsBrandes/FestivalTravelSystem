@@ -42,7 +42,7 @@ class BookingTest extends TestCase
         $bus = Bus::factory()->create([
             'name' => 'Test Bus',
             'license_plate' => '12-34-5',
-            'status' => 'available',
+            'status' => 'reserved',
             'total_seats' => 50,
             'available_seats' => 50,
         ]);
