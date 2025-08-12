@@ -24,8 +24,6 @@ class BookingController extends Controller
             return redirect()->back()->withErrors(['error' => 'Festival is not active.']);
         }
 
-        $startingLocation = $request->starting_location;
-
         $totalPrice = $festival->price * $request->quantity;
         $totalPoints = round($totalPrice, 0);
 
@@ -33,7 +31,7 @@ class BookingController extends Controller
             ->where('starting_location', $request->starting_location)
             ->whereHas('bus', function ($query) use ($request) {
                 $query->where('available_seats', '>=', $request->quantity)
-                    ->where('status', 'available');
+                    ->where('status', 'reserved');
             })->first();
 
         if (!$trip) {
@@ -61,24 +59,58 @@ class BookingController extends Controller
             'reward_id' => 'nullable|exists:rewards,id',
         ]);
 
-        $festival = Festival::where('id', $request->festival_id)->where('is_active', true)->first();
+        $festival = Festival::where('id', $request->festival_id)
+            ->where('is_active', true)->first();
 
         if (!$festival) {
-            return redirect()->back()->withErrors(['error' => 'Festival is not active or does not exist.']);
+            return back()->withErrors(['error' => 'Festival is not active or does not exist.']);
         }
 
-        $totalPrice = $festival->price * $request->quantity;
-        $totalPoints = round($totalPrice, 0);
+        $trip = Trip::with('bus')->findOrFail($request->trip_id);
+
+        if (
+            $trip->festival_id !== $festival->id
+            || !$trip->bus
+            || $trip->bus->status !== 'reserved'
+            || $trip->bus->available_seats < $request->quantity
+        ) {
+            return back()->withErrors(['error' => 'No available trip found or not enough available seats for the selected trip.']);
+        }
+
+        $totalPrice  = $festival->price * $request->quantity;
+        $totalPoints = (int) round($totalPrice, 0);
+
+        $bus = $trip->bus;
+        $bus->available_seats -= $request->quantity;
+
+        if ($bus->available_seats < 0) {
+            return back()->withErrors(['error' => 'No available trip found or not enough available seats for the selected trip.']);
+        }
+
+        if ($bus->available_seats == 0) {
+            $bus->status = 'full';
+        }
+
+        $bus->save();
+
+        $booking = Booking::create([
+            'festival_id' => $festival->id,
+            'user_id' => auth()->id(),
+            'ticket_quantity' => $request->quantity,
+            'total_price' => $totalPrice,
+            'total_points' => $totalPoints,
+            'status' => 'confirmed',
+            'trip_id' => $trip->id,
+        ]);
 
         if ($request->reward_id) {
-            $reward = auth()->user()->rewards()->findOrFail($request->reward_id);
-
-            $discountAmountInEuros = $totalPrice / 100 * $reward->discount_percentage;
-
-            $totalPrice -= $discountAmountInEuros;
+            $reward = auth()->user()->rewards()->wherePivot('used', false)->findOrFail($request->reward_id);
+            $discount = $totalPrice * ($reward->discount_percentage / 100);
+            $booking->total_price = $totalPrice - $discount;
+            $booking->save();
 
             auth()->user()->rewards()->updateExistingPivot($reward->id, [
-                'used' => true,
+                'used'    => true,
                 'used_at' => now(),
             ]);
         }
@@ -87,49 +119,17 @@ class BookingController extends Controller
         $user->points += $totalPoints;
         $user->save();
 
-        $trips = Trip::where('festival_id', $festival->id)->get();
-
-        $selectedTrip = $trips->first(function ($trip) use ($request) {
-            return $trip->bus && $trip->bus->available_seats >= $request->quantity && $trip->bus->status === 'available';
-        });
-
-        if (!$selectedTrip) {
-            return redirect()->back()->withErrors(['error' => 'No available trip found or not enough available seats for the selected trip.']);
-        }
-
-        $bus = $selectedTrip->bus;
-        $bus->available_seats -= $request->quantity;
-
-        if ($bus->available_seats <= 0) {
-            $bus->status = 'full';
-        }
-
-        $bus->save();
-
-        $booking = Booking::create([
-            'festival_id' => $request->festival_id,
-            'user_id' => auth()->id(),
-            'ticket_quantity' => $request->quantity,
-            'total_price' => $totalPrice,
-            'total_points' => $totalPoints,
-            'status' => 'pending',
-            'trip_id' => $selectedTrip->id,
-        ]);
-
-        if ($booking) {
-            $booking->status = 'confirmed';
-            $booking->save();
-        } else {
-            return redirect()->back()->withErrors(['error' => 'Booking could not be created.']);
-        }
-
         return redirect()->route('bookings.show', ['booking' => $booking->id])
-                         ->with('status', 'Booking created successfully!');
+            ->with('status', 'Booking created successfully!');
     }
 
     public function show($id)
     {
         $booking = Booking::findOrFail($id);
+
+        if ($booking->user_id !== Auth::id()) {
+            abort(403);
+        }
 
         $booking->reward = auth()->user()->rewards()
             ->where('used', true)
@@ -166,6 +166,11 @@ class BookingController extends Controller
     {
         if ($booking->status !== 'canceled' && Auth::id() === $booking->user->id) {
             $booking->trip->bus->available_seats += $booking->ticket_quantity;
+
+            if ($booking->trip->bus->status === 'full' && $booking->trip->bus->available_seats > 0) {
+                $booking->trip->bus->status = 'reserved';
+            }
+
             $booking->trip->bus->save();
 
             $acquiredPoints = $booking->total_points;
@@ -211,18 +216,60 @@ class BookingController extends Controller
 
     public function reconfirm($id)
     {
-        $booking = Booking::findOrFail($id);
+        $booking = Booking::with('trip.bus')->findOrFail($id);
+
+        if ($booking->status === 'confirmed') {
+            return redirect()->route('admin.bookings.index')
+                             ->withErrors(['error' => 'Booking is already confirmed.']);
+        }
+
+        $bus = $booking->trip->bus;
+
+        if ($bus->available_seats < $booking->ticket_quantity) {
+            return back()->withErrors(['error' => 'Not enough seats to reconfirm.']);
+        }
+
+        $bus->available_seats -= $booking->ticket_quantity;
+        $bus->status = 'reserved';
+
+        if ($bus->available_seats === 0) {
+            $bus->status = 'full';
+        }
+
+        $bus->save();
+
+        $user = $booking->user;
+        $user->points += (int)$booking->total_points;
+        $user->save();
 
         $booking->status = 'confirmed';
         $booking->save();
 
         return redirect()->route('admin.bookings.index')
-                         ->with('status', 'Booking reconfirmed successfully!');
+            ->with('status', 'Booking reconfirmed successfully!');
     }
 
     public function destroy($id)
     {
-        $booking = Booking::findOrFail($id);
+        $booking = Booking::with('trip.bus')->findOrFail($id);
+
+        if ($booking->status === 'canceled') {
+            return redirect()->route('admin.bookings.index')
+                             ->withErrors(['error' => 'Booking is already canceled.']);
+        }
+
+        $bus = $booking->trip->bus;
+        $bus->available_seats += $booking->ticket_quantity;
+
+        if ($bus->status !== 'reserved' && $bus->available_seats > 0) {
+            $bus->status = 'reserved';
+        }
+
+        $bus->save();
+
+        $user = $booking->user;
+        $user->points -= (int)$booking->total_points;
+        $user->save();
 
         $booking->status = 'canceled';
         $booking->save();

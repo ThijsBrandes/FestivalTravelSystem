@@ -38,10 +38,12 @@
 
                     <form method="POST" action="{{ route('booking.create', ['festival_id' => $festival->id, 'quantity' => $quantity, 'trip_id' => $trip->id]) }}" class="mt-4">
                         @csrf
+                        @method('POST')
                         <label class="text-lg font-semibold mt-4">Got a reward you want to use?</label>
 
                         <select name="reward_id" class="w-full p-2 border border-gray-300 rounded" id="reward-select">
                             <option value="">Select a reward</option>
+
                             @foreach ($rewards as $reward)
                                 <option value="{{ $reward->id }}" data-discount="{{ $reward->discount_percentage }}">{{ $reward->name }}</option>
                             @endforeach
