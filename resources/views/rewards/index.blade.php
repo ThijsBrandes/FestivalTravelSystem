@@ -56,20 +56,22 @@
                             <p class="text-sm text-gray-600">Description: {{ $reward->description }}</p>
 
                             @if (auth()->user()->points < $reward->points_required)
-                                <button type="button" disabled class="px-4 py-2 bg-gray-300 text-white rounded hover:bg-gray-300">
+                                <button type="button" disabled class="px-4 py-2 bg-gray-300 text-white rounded">
                                     <p>Not enough points</p>
                                 </button>
                             @elseif (auth()->user()->rewards()->where('rewards.id', $reward->id)->exists())
-                                <button type="button" disabled class="px-4 py-2 bg-gray-300 text-white rounded hover:bg-gray-300">
+                                <button type="button" disabled class="px-4 py-2 bg-gray-300 text-white rounded">
                                     <p>Already redeemed</p>
                                 </button>
                             @else
                                 <form method="POST" action="{{ route('rewards.redeem', $reward->id) }}" class="mt-4">
-                                @csrf
-                                <input type="hidden" name="reward_id" value="{{ $reward->id }}">
-                                <button type="submit" class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
-                                    Redeem
-                                </button>
+                                    @csrf
+
+                                    <input type="hidden" name="reward_id" value="{{ $reward->id }}">
+
+                                    <button type="submit" class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
+                                        Redeem
+                                    </button>
                                 </form>
                             @endif
                         </div>

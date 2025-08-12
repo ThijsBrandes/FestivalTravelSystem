@@ -11,7 +11,7 @@
                 <div>
                     <img
                         src="{{ asset($booking->festival->image ?? 'No image available') }}"
-                        alt="{{ $booking->festival->name }}"
+                        alt="{{ $booking->festival->name ?? 'Festival Image' }}"
                         class="w-full h-[300px] object-cover mt-2 rounded-lg"
                     >
                 </div>

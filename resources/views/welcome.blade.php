@@ -22,7 +22,7 @@
 
                                 <img
                                     src="{{ asset($festival->image ?? 'No image available') }}"
-                                    alt="{{ $festival->name }}"
+                                    alt="{{ $festival->name ?? 'Festival Image' }}"
                                     class="w-full h-48 object-cover mt-2"
                                 >
 
