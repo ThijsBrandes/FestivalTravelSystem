@@ -63,6 +63,14 @@
                             </label>
                         </div>
 
+                        <div class="mb-4">
+                            <label for="featured" class="inline-flex items-center">
+                                <input type="hidden" name="featured" value="0">
+                                <input type="checkbox" name="featured" id="featured" value="1" {{ $festival->featured ? 'checked' : '' }} class="form-checkbox h-5 w-5 text-blue-600">
+                                <span class="ml-2 text-gray-700">Feature this festival</span>
+                            </label>
+                        </div>
+
                         <div id="trips-container" class="mb-6">
                             <h3 class="text-lg font-semibold mb-2">Trips</h3>
 

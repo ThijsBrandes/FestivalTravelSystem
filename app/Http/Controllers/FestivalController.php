@@ -85,7 +85,23 @@ class FestivalController extends Controller
 
     public function home()
     {
-        $festivals = Festival::all()->take(4);
+        $festivals = Festival::where('featured', true)->where('is_active', true)
+            ->orderBy('date', 'asc')
+            ->get();
+
+        if ($festivals->isEmpty()) {
+            $festivals = Festival::all()->where('is_active', true)->take(4);
+        }
+
+        $amount = $festivals->count();
+
+        if ($amount < 4) {
+            $additionalFestivals = Festival::where('is_active', true)
+                ->whereNotIn('id', $festivals->pluck('id'))
+                ->take(4 - $amount)
+                ->get();
+            $festivals = $festivals->merge($additionalFestivals);
+        }
 
         return view('welcome', [
             'festivals' => $festivals,
@@ -139,6 +155,7 @@ class FestivalController extends Controller
             'price' => 'required|numeric|min:0',
             'image' => 'required|image|mimes:jpeg,png,jpg,svg|max:2048',
             'is_active' => 'boolean',
+            'featured' => 'boolean',
         ]);
 
         $validatedData['image'] = $request->file('image')->store('festival-images', 'public');
@@ -192,6 +209,7 @@ class FestivalController extends Controller
             'price' => 'required|numeric|min:0',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,svg|max:2048',
             'is_active' => 'boolean',
+            'featured' => 'boolean',
         ]);
 
         // Handle image
