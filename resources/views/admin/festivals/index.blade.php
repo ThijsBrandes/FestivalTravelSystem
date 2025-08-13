@@ -72,6 +72,10 @@
                                     <span class="inline-block bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs font-semibold">Inactive</span>
                                 @endif
 
+                                @if ($festival->featured)
+                                    <span class="inline-block bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-semibold">Featured</span>
+                                @endif
+
                                 <div class="mt-4">
                                     <a href="{{ route('admin.festivals.edit', $festival) }}" class="text-blue-600 hover:underline">
                                         Edit

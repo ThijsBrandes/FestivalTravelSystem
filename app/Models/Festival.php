@@ -23,6 +23,7 @@ class Festival extends Model
         'location',
         'price',
         'is_active',
+        'featured',
     ];
 
 
