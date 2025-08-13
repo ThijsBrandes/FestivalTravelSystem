@@ -58,26 +58,26 @@
                     @endif
 
                     @foreach ($festivals as $festival)
-                        <div class="mb-4">
+                        <div class="mb-10 pb-10 border-b border-gray-400">
                             <h3 class="text-lg font-semibold">{{ $festival->name }}</h3>
 
                             <img
                                 src="{{ asset($festival->image ?? 'No image available') }}"
                                 alt="{{ $festival->name }}"
-                                class="w-32 h-48 object-cover mt-2"
+                                class="w-1/2 h-48 object-cover mt-2"
                             >
 
-                            <p class="text-sm text-gray-600">Price: €{{ number_format($festival->price, 2) }}</p>
-                            <p class="text-sm text-gray-600">Location: {{ $festival->location }}</p>
-                            <p class="text-sm text-gray-600">Date: {{ \Carbon\Carbon::parse($festival->date)->format('d/m/y H:i') }}</p>
+                            <p class="text-lg text-gray-600"><strong>Price: </strong>€{{ number_format($festival->price, 2) }}</p>
+                            <p class="text-lg text-gray-600"><strong>Location: </strong>{{ $festival->location }}</p>
+                            <p class="text-lg text-gray-600"><strong>Date: </strong>{{ \Carbon\Carbon::parse($festival->date)->format('d/m/y H:i') }}</p>
 
                             @auth
                                 @if(!$festival->is_active)
-                                <p class="text-sm text-red-600">Festival is not active</p>
+                                <p class="text-lg text-red-600">Festival is not active</p>
                                 @elseif ($festival->availableSeats > 0)
-                                    <p class="text-sm text-green-600">Available Seats: {{ $festival->availableSeats }}</p>
+                                    <p class="text-lg text-green-600">Available Seats: {{ $festival->availableSeats }}</p>
                                 @elseif ($festival->availableSeats === 0)
-                                    <p class="text-sm text-red-600">No seats available</p>
+                                    <p class="text-lg text-red-600">No seats available</p>
                                 @else
                                     <p class="text-sm text-red-600">Not available right now</p>
                                 @endif
