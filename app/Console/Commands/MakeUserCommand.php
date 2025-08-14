@@ -34,7 +34,6 @@ class MakeUserCommand extends Command
         $password = $this->secret('What is the user password?');
         $confirmPassword = $this->secret('Confirm the password');
 
-        // Validate input
         $validator = Validator::make([
             'name' => $name,
             'email' => $email,
@@ -53,7 +52,6 @@ class MakeUserCommand extends Command
             return 1;
         }
 
-        // Create the user
         $user = User::create([
             'name' => $name,
             'email' => $email,
